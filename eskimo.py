@@ -33,9 +33,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from random import random
+from rand import rand
 from input import inp
-from input import getch
+from input import get
 
 
 
@@ -104,7 +104,7 @@ def paperwal():
         check_rounds = 1000
     else:
         check_rounds = 50
-    random.platform_check(check_rounds)
+    rand.platform_check(check_rounds)
     runcount = 0
 
     while runcount < 1 or options.repeat:
@@ -136,7 +136,7 @@ def paperwal():
         else:
             userentropy = inp.keyboard_entropy(quiet=options.silent)
 
-        privk = random_key(userentropy)
+        privk = rand.random_key(userentropy)
         wallettest = ['', '']
         for loop in xrange(calcs):
             privc = o_priv_wif_c(privk, 48)

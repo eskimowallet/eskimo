@@ -1,6 +1,7 @@
-from random import random
-from input import getch
-from output import prnt
+from rand import rand
+from input import get
+from output import out
+import hashlib
 
 def keyboard_passphrase(turn=0, quiet=False):  # this can't really be "quiet"
     progress_step = 0
@@ -30,18 +31,18 @@ def keyboard_entropy(keynum=32, quiet=False):
     512 bit random number from keyboard and keypress timer
     """
 
-    keypress = getch._Getch()
+    keypress = get._Getch()
     typed = kr = 'Press keys to generate secure address........'
-    hashes = random.clockrnd()
-    prnt.prnt(kr, quiet)
+    hashes = rand.clockrnd()
+    out.prnt(kr, quiet)
     for step in range(keynum, 0, -1):
         for cnt in xrange(10000000):  # only loops on OSX
-            hashes ^= random.clockrnd()
+            hashes ^= rand.clockrnd()
             kr = keypress()
             if kr != '':
                 break
         typed += kr
-        hashes ^= random.clockrnd()
-        prnt.prnt('\b\b\b\b{0:4d}'.format(step-1), quiet)
-    prnt.prnt('\b\b\b\b  OK\n', quiet)
+        hashes ^= rand.clockrnd()
+        out.prnt('\b\b\b\b{0:4d}'.format(step-1), quiet)
+    out.prnt('\b\b\b\b  OK\n', quiet)
     return hashes ^ int(hashlib.sha512(typed*8).hexdigest(), 16)
