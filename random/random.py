@@ -1,3 +1,5 @@
+import hashlib
+
 def clockbase():
     """
     256 bit hex: 4 x 16 byte long from float using clock (process time) + time (UTC epoch time)
