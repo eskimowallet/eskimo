@@ -1,8 +1,7 @@
 from sys import stdout
 
-def prnt(printstring, silent=False):
-    """
-    STDOUT console printing with an option to disable
-    """
-    if not silent:
-        stdout.write(printstring)
+def prnt(printstring):
+    	"""
+    	STDOUT console printing with an option to disable
+    	"""
+	stdout.write(printstring)

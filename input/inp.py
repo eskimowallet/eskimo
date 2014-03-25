@@ -26,15 +26,15 @@ def keyboard_passphrase(turn=0, quiet=False):  # this can't really be "quiet"
     prnt('\b\n', quiet)
     return passw
 	
-def keyboard_entropy(keynum=32, quiet=False):
+def keyboardEntropy(keynum=64):
     """
     512 bit random number from keyboard and keypress timer
     """
 
     keypress = get._Getch()
-    typed = kr = 'Press keys to generate secure address........'
+    typed = kr = 'Press keys to generate secure address........\n'
     hashes = rand.clockrnd()
-    out.prnt(kr, quiet)
+    out.prnt(kr)
     for step in range(keynum, 0, -1):
         for cnt in xrange(10000000):  # only loops on OSX
             hashes ^= rand.clockrnd()
@@ -43,6 +43,6 @@ def keyboard_entropy(keynum=32, quiet=False):
                 break
         typed += kr
         hashes ^= rand.clockrnd()
-        out.prnt('\b\b\b\b{0:4d}'.format(step-1), quiet)
-    out.prnt('\b\b\b\b  OK\n', quiet)
+        out.prnt('\b\b\b\b{0:4d}'.format(step-1))
+    out.prnt('\nOK\n')
     return hashes ^ int(hashlib.sha512(typed*8).hexdigest(), 16)

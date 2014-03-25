@@ -1,6 +1,7 @@
 import hashlib
 from encode import enc
 from elip import elip
+from output import out
 
 def clockbase():
     """
@@ -27,22 +28,22 @@ def clockrnd():
     return hash1 ^ hash2
 
 
-def platform_check(checks=50, quiet=False):
+def platformCheck(checks=500):
     from collections import Counter
-    if checks > 100 and not quiet:
-        prnt('** Running platform validation tests **\n', quiet)
-    l = []
+    if checks > 100:
+        out.prnt('** Please wait while your platform is checked for a good, random source of entropy **\n')
+    randList = []
     for zbit in xrange(checks):
-        l.append(clockrnd())
-    r = Counter(l).most_common(1)
-    x, count = r[0]
+        randList.append(clockrnd())
+    duplicateCheck = Counter(randList).most_common(1)
+    x, count = duplicateCheck[0]
     if count != 1:
-        raise Exception('FAIL: time-based entropy not always unique!')
-    if checks > 100 and not quiet:
-        prnt('...pass\n', quiet)
+        raise Exception('FAIL: time-based entropy is not always unique!')
+    if checks > 100:
+        out.prnt('...pass\n')
     return True
 
-def random_key(entropy):
+def randomKey(entropy):
     """
     256 bit number from equally strong urandom, user entropy, and timer parts
     """
