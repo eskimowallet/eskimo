@@ -36,6 +36,8 @@ THE SOFTWARE.
 from rand import rand
 from input import inp
 from input import get
+from output import out
+from encrypt import address
 
 
 
@@ -139,11 +141,10 @@ def paperwal():
         privk = rand.random_key(userentropy)
         wallettest = ['', '']
         for loop in xrange(calcs):
-            privc = o_priv_wif_c(privk, 48)
-            print(base58_to_hex(privc))
+            privc = address.o_priv_wif_c(privk, 48)
             #priv_wif_c = o_b58(encode(privk, 256, 32) + '\x01', ord('\x80'))
-            pubc = o_priv_to_pub(privk)
-            paper_address = 'Bitcoin Address:\n ' + o_pub_to_addr(pubc, 48) + '\n'
+            pubc = address.o_priv_to_pub(privk)
+            paper_address = 'Bitcoin Address:\n ' + address.o_pub_to_addr(pubc, 48) + '\n'
             if not options.encrypted:
                 paper_address += 'Private Key:\n ' + privc + '\n'
             else:
@@ -156,9 +157,9 @@ def paperwal():
             if loop > 0:
                 if wallettest[loop] != wallettest[loop-1]:
                     print("### CALCULATION FAILURE DETECTED - DO NOT USE ###")
-                    prnt("### CALCULATION FAILURE DETECTED - DO NOT USE ###\n")
+                    out.prnt("### CALCULATION FAILURE DETECTED - DO NOT USE ###\n")
             else:
-                prnt('\n' + paper_address + '\n')
+                out.prnt('\n' + paper_address + '\n')
         runcount += 1
 
     if not options.nopause:

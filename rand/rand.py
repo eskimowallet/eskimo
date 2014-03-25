@@ -1,5 +1,6 @@
 import hashlib
 from encode import enc
+from elip import elip
 
 def clockbase():
     """
@@ -52,7 +53,7 @@ def random_key(entropy):
     entstr = enc.encode(entropy, 16) + enc.encode(osrndi.getrandbits(512), 256) + str(clockrnd())
     osrnd = SystemRandom(entstr)
     privkey = 0
-    while privkey < 1 or privkey > N:
+    while privkey < 1 or privkey > elip.N:
         privkey = enc.decode(hashlib.sha256(enc.encode(osrnd.getrandbits(512), 256)).digest(), 256) ^ osrnd.getrandbits(256)
         for lbit in xrange(clockrnd() % 64 + 64):
             clockstr = hex(clockrnd()) + str(clockrnd()) + entstr
