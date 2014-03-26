@@ -45,7 +45,7 @@ def generate(cur):
 	c.execute('select v.version,v.prefix,v.length,c.id,c.longName from eskimo_versions as v inner join eskimo_currencies as c on c.version = v.id where c.currency=?;', (cur.upper(),))
 	version = c.fetchone()
 	if version is None:
-		out.prnt(cur.upper() + ' is not currently listed as a currency\n')
+		out.prnt('\n' + cur.upper() + ' is not currently listed as a currency\n\n')
 		return False
 	privateKey = rand.randomKey(inp.keyboardEntropy())
 	publicKey = privateKey2PublicKey(privateKey)
