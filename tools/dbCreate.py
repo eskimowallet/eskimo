@@ -9,6 +9,8 @@ def buildDB():
 	c.execute('create table eskimo_versions (id integer primary key not null, version int, prefix varchar(255), length integer);')
 	c.execute('create table eskimo_currencies (id integer primary key not null, currency varchar(255), longName varchar(255), version integer, foreign key(version) references eskimo_versions(id));')
 	c.execute('create table eskimo_privK (id integer primary key not null, privK varchar(255), currency integer, foreign key(currency) references eskimo_currencies(id));')
+	c.execute('create table eskimo_addresses (id integer primary key not null, address varchar(255), currency integer, foreign key(currency) references eskimo_currencies(id));')
+	c.execute('create table eskimo_master (id integer primary key not null, address integer, privK integer, foreign key(address) references eskimo_addresses(id), foreign key(privK) references eskimo_privK(id));') 
 
 	#load the known data about version numbers
 	c.execute('insert into eskimo_versions (version, prefix, length) VALUES (?,?,?);', (0,'1',34))

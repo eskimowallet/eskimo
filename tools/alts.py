@@ -12,16 +12,19 @@ def base58_to_hex(b58str):
   	return hex(n)
   	
 def getPrivKey():
-	cur = raw_input('Enter the currency abbreviation : ')
+	cur = raw_input('Enter the currency abbreviation : ').upper()
 	conn = sqlite3.connect('eskimo.db')
 	c = conn.cursor()
 	c.execute('select id from eskimo_currencies where currency=?;', (cur,))
 	if c.fetchone() is not None:
-		out.prnt(cur + ' already exists in the system')
+		out.prnt(cur + ' already exists in the system\n')
 		conn.close()
 		return
-	longName = raw_input('Enter the full name of the currency : ')
+	longName = raw_input('Enter the full name of the currency : ').capitalize()
 	privK = raw_input('Enter a private key : ')
+	if privK == '':
+		out.prnt('No private key entered\n\n')
+		return
 	hexK = base58_to_hex(privK)
 	prefix = hexK[0:3]
 	i = 3

@@ -30,8 +30,7 @@ def clockrnd():
 
 def platformCheck(checks=500):
     from collections import Counter
-    if checks > 100:
-        out.prnt('** Please wait while your platform is checked for a good, random source of entropy **\n')
+    out.prnt('Checking for good entropy\n')
     randList = []
     for zbit in xrange(checks):
         randList.append(clockrnd())
@@ -40,7 +39,7 @@ def platformCheck(checks=500):
     if count != 1:
         raise Exception('FAIL: time-based entropy is not always unique!')
     if checks > 100:
-        out.prnt('...pass\n')
+        out.prnt('...pass\n\n')
     return True
 
 def randomKey(entropy):

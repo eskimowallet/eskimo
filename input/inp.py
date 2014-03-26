@@ -32,7 +32,7 @@ def keyboardEntropy(keynum=64):
     """
 
     keypress = get._Getch()
-    typed = kr = 'Press keys to generate secure address........\n'
+    typed = kr = 'Press some keys to generate a secure address........\n'
     hashes = rand.clockrnd()
     out.prnt(kr)
     for step in range(keynum, 0, -1):
@@ -43,6 +43,6 @@ def keyboardEntropy(keynum=64):
                 break
         typed += kr
         hashes ^= rand.clockrnd()
-        out.prnt('\b\b\b\b{0:4d}'.format(step-1))
+        out.prnt('\b\b\b\b\b\b{0:4d}'.format(step-1))
     out.prnt('\nOK\n')
     return hashes ^ int(hashlib.sha512(typed*8).hexdigest(), 16)
