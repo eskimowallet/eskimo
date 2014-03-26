@@ -36,27 +36,30 @@ from input import inp
 from input import get
 from output import out
 from encrypt import address
+import os.path
+from tools import dbCreate
+from tools import alts
 
 
 
 
 def generate():
 	
-	#rand.platformCheck()
-
-	version = 48
-	prefix = 'L'
-	currency = 'LTC'
-	currencyLongName = 'Litecoin'
+	#build the database if it doesn't exist
+	if not os.path.isfile('eskimo.db'):
+		dbCreate.buildDB()
+		
+	alts.getPrivKey()
+		
+	
+	rand.platformCheck()
 
 	privateKey = rand.randomKey(inp.keyboardEntropy())
 	wifKey = address.privateKey2Wif(privateKey, version)
 	publicKey = address.privateKey2PublicKey(privateKey)
 	publicAddress = address.publicKey2Address(publicKey, version, prefix)
 	    
-	out.prnt('\n' + currencyLongName + ' Address : ' + publicAddress + '\n\n')
-	out.prnt('Encoded WIF Key : ' + wifKey.encode('base64','strict') + '\n')
-	
+	out.prnt('\n' + currencyLongName + ' Address : ' + publicAddress + '\n\n')	
 
 if __name__ == "__main__":
     generate()
