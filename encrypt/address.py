@@ -63,7 +63,7 @@ def generate(cur):
 	return	
 	
 def dumpPrivKey():
-	addressIn = raw_input('Enter the address for which you want to see the private key : ')
+	addressIn = raw_input('\nEnter the address to dump the private key : ')
 	conn = sqlite3.connect('eskimo.db')
 	c = conn.cursor()
 	c.execute('select p.privK,c.longName,v.version from eskimo_privK as p inner join eskimo_master as m on m.privK = p.id inner join eskimo_addresses as a on m.address = a.id inner join eskimo_currencies as c on p.currency = c.id inner join eskimo_versions as v on c.version = v.id where a.address = ?;', (addressIn.encode('base64', 'strict'),))
