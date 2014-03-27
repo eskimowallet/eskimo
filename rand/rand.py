@@ -28,19 +28,22 @@ def clockrnd():
     return hash1 ^ hash2
 
 
-def platformCheck(checks=500):
-    from collections import Counter
-    out.prnt('Checking for good entropy\n')
-    randList = []
-    for zbit in xrange(checks):
-        randList.append(clockrnd())
-    duplicateCheck = Counter(randList).most_common(1)
-    x, count = duplicateCheck[0]
-    if count != 1:
-        raise Exception('FAIL: time-based entropy is not always unique!')
-    if checks > 100:
-        out.prnt('...pass\n\n')
-    return True
+def platformCheck(checks=1000):
+	from collections import Counter
+	print('Checking for good entropy')
+	randList = []
+	count = 0
+	for zbit in xrange(checks):
+		out.prnt('\b\b\b\b\b\b{0:4d}'.format(1000-count))
+		count += 1
+		randList.append(clockrnd())
+	out.prnt('\b\b\b\b\b\b\b\b\b')
+	duplicateCheck = Counter(randList).most_common(1)
+	x, count = duplicateCheck[0]
+	if count != 1:
+		raise Exception('FAIL: time-based entropy is not always unique!')
+	print('...pass')
+	return True
 
 def randomKey(entropy):
     """

@@ -9,7 +9,7 @@ Cold storage crypto-currency address generator
 from rand import rand
 from input import inp
 from input import get
-from output import out
+from output import list
 from encrypt import address
 import os.path
 from tools import dbCreate
@@ -24,39 +24,40 @@ if not os.path.isfile('eskimo.db'):
 
 try:
 	
-	out.prnt('Enter a currency abbreviation to generate an address\n')
-	out.prnt('or enter a command for a different function\n')
-	out.prnt('("help" lists available functions)\n')
+	print('Enter a currency abbreviation to generate an address')
+	print('or enter a command for a different function')
+	print('("help" lists available functions)')
 	
 	while True:
 		
-		command = raw_input('Enter command : ')
+		print('')
+		command = raw_input('Enter command : ').lower().strip()
 		
-		if command.lower() == 'exit':
+		if command == 'exit':
 			sys.exit()
 		
-		if command.lower() == 'help':
-			out.prnt('show help\n')
+		if command == 'help':
+			list.help()
 			continue
 		
-		elif command.lower() == 'importprivkey':
-			alts.getPrivKey()
+		elif command == 'scanprivkey':
+			alts.scanPrivKey()
 			continue
 			
-		elif command.lower() == 'dumpprivkey':
+		elif command == 'dumpprivkey':
 			address.dumpPrivKey()
 			continue
 			
-		elif command.lower() == 'entropycheck':
+		elif command == 'entropycheck':
 			rand.platformCheck()
 			continue
 
-		elif command.lower() == 'currencycheck':
-			out.prnt('display available currencyies\n')
+		elif command == 'listcur':
+			list.showCurrencies()
 			continue
 		
-		elif command.lower() == 'showaddresses':
-			out.prnt('ask for currency then show addresses\n')
+		elif command == 'listadd':
+			list.showAddresses()
 			continue
 			
 		else:
