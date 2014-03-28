@@ -14,6 +14,7 @@ from encrypt import address
 import os.path
 from tools import dbCreate
 from tools import alts
+from tools import curData
 import sys
 
 
@@ -49,6 +50,10 @@ try:
 		elif command == 'entropycheck':
 			rand.platformCheck()
 			continue
+		
+		elif command == 'listaddr':
+			list.showAddresses()
+			continue
 
 		elif command == 'listcur':
 			list.showCurrencies()
@@ -61,9 +66,13 @@ try:
 		elif command == 'editcur':
 			alts.editAlt()
 			continue
-		
-		elif command == 'listaddr':
-			list.showAddresses()
+			
+		elif command == 'import':
+			curData.importAlts()
+			continue
+			
+		elif command == 'export':
+			curData.exportAlts()
 			continue
 			
 		else:
