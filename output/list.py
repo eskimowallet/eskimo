@@ -26,7 +26,7 @@ def showCurrencies():
 		return False
 	print('')
 	for currency in currencies:
-		print(str(currency[1]) + '   |   ' + str(currency[2]) + '   |   ' + str(currency[3]))
+		print(str(currency[1]) + '   |   ' + str(currency[2]))
 	return True
 	
 def help():
@@ -40,24 +40,27 @@ def help():
 	print('')	
 	print('== commands ==')
 	print('')
-	print('exit - quit eskimo.')
-	print('(you can use ctrl+c too).')
+	print('exit')
+	print('  quit eskimo. (you can use ctrl+c too).')
 	print('')
-	print('help - show this dialogue.')
+	print('help')
+	print('  show this dialogue.') 
 	print('')
-	print('scanprivkey - add a new crypto-currency to your eskimo system.') 
-	print('eskimo can only generate addresses and private keys for currencies which exist in the system.')
+	print('dumpprivkey')
+	print('  enter an eskimo generated address when prompted to view the associated private key.')
 	print('')
-	print('dumpprivkey - enter an eskimo generated address when prompted to view the associated private key.')
+	print('entropycheck')
+	print('  check your platform for a strong source of entropy.')
 	print('')
-	print('entropycheck - check your platform for a strong source of entropy.')
-	print('this is important for generating random keys and secure addresses.')
+	print('listcur')
+	print('  list the currencies which have been added to the eskimo system.')
 	print('')
-	print('listcur - list the currencies which have been added to the eskimo system.')
+	print('addcur')
+	print('  add a new crypto-currency to your eskimo system.')
 	print('')
-	print('listadd - list the addresses which eskimo has generated for a given currency.')
+	print('listaddr')
+	print('  list the addresses which eskimo has generated for a given currency.')
 	print('')
 	print('==============')
-	print('')
 	return
 	

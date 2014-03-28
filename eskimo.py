@@ -20,6 +20,8 @@ import sys
 #build the database if it doesn't exist
 if not os.path.isfile('eskimo.db'):
 	dbCreate.buildDB()
+	#as this is likely a first run, scan for entropy
+	rand.platformCheck()
 
 
 try:
@@ -39,10 +41,6 @@ try:
 		if command == 'help':
 			list.help()
 			continue
-		
-		elif command == 'scanprivkey':
-			alts.scanPrivKey()
-			continue
 			
 		elif command == 'dumpprivkey':
 			address.dumpPrivKey()
@@ -56,7 +54,11 @@ try:
 			list.showCurrencies()
 			continue
 		
-		elif command == 'listadd':
+		elif command == 'addcur':
+			alts.scanPrivKey()
+			continue
+		
+		elif command == 'listaddr':
 			list.showAddresses()
 			continue
 			
