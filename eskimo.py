@@ -55,7 +55,11 @@ try:
 			continue
 		
 		elif command == 'addcur':
-			alts.scanPrivKey()
+			alts.addAlt()
+			continue
+			
+		elif command == 'editcur':
+			alts.editAlt()
 			continue
 		
 		elif command == 'listaddr':

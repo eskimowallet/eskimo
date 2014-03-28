@@ -26,7 +26,7 @@ def showCurrencies():
 		return False
 	print('')
 	for currency in currencies:
-		print(str(currency[1]) + '   |   ' + str(currency[2]))
+		print('{0: <5}'.format(str(currency[1])) + '   |   ' + '{0: >5}'.format(str(currency[2])))
 	return True
 	
 def help():
@@ -57,6 +57,9 @@ def help():
 	print('')
 	print('addcur')
 	print('  add a new crypto-currency to your eskimo system.')
+	print('')
+	print('editcur')
+	print('  edit an existing crypto-currency.')
 	print('')
 	print('listaddr')
 	print('  list the addresses which eskimo has generated for a given currency.')
