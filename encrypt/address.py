@@ -60,10 +60,11 @@ def generate(cur):
 	conn.close() 
 	print('')
 	print(version[4] + ' Address : ' + publicAddress + '\n')
-	print(str(privateKey2Wif(privateKey, version[0])))
+	#uncomment out the line below to show the WIF private key upon creation
+	#print(str(privateKey2Wif(privateKey, version[0])))
 	return	
 	
-def dumpPrivKey():
+def dumpPrivKey(raw=0):
 	addressIn = raw_input('\nEnter the address to dump the private key : ')
 	print('')
 	conn = sqlite3.connect('eskimo.db')
@@ -74,5 +75,8 @@ def dumpPrivKey():
 		print('No matching private key was found')
 		return False
 	print('Private Key for ' + privK[1] + ' address ' + addressIn + ' is:\n')
-	print(privateKey2Wif(long(str(privK[0]).decode('base64', 'strict')), privK[2]))
+	if raw == 1:
+		print(str(privK[0]).decode('base64', 'strict'))
+	else:
+		print(privateKey2Wif(long(str(privK[0]).decode('base64', 'strict')), privK[2]))
 	return 	 

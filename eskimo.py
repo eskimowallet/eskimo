@@ -46,7 +46,11 @@ try:
 		elif command == 'dumpprivkey':
 			address.dumpPrivKey()
 			continue
-			
+		
+		elif command == 'dumpprivkeyraw':
+			address.dumpPrivKey(1)
+			continue		
+		
 		elif command == 'entropycheck':
 			rand.platformCheck()
 			continue
