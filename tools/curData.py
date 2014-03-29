@@ -3,7 +3,7 @@ import json
 import os.path
 
 def exportAlts():
-	conn = sqlite3.connect('eskimo.db')
+	conn = sqlite3.connect('igloo.dat')
 	c = conn.cursor()
 	c.execute('select c.currency, c.longName, v.version from eskimo_currencies as c inner join eskimo_versions as v on c.version = v.id;')
 	currencies = c.fetchall()
@@ -22,7 +22,7 @@ def importAlts():
 		return False
 	with open('alts.json', 'r') as dataFile:
 		currencies = json.load(dataFile)
-	conn = sqlite3.connect('eskimo.db')
+	conn = sqlite3.connect('igloo.dat')
 	c = conn.cursor()
 	c.execute('delete from eskimo_currencies;')
 	inCount = 0

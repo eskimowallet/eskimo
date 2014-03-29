@@ -9,15 +9,24 @@ def base58_to_hex(b58str):
     		n += digit
   	return hex(n)
   	
-def addAlt():
-	cur = raw_input('Enter the currency abbreviation : ').upper().strip()
+def scanPrivKey(privK):
+	hexK = base58_to_hex(privK)
+	prefix = hexK[0:3]
+	i = 3
+	while int(prefix, 16) < 128:
+		prefix += hexK[i]
+		i += 1
+	return int(prefix, 16)-128
+  	
+def addAlt(cur):
 	if cur == '':
+		print('a currency abbreviation is required')
 		return False
-	conn = sqlite3.connect('eskimo.db')
+	conn = sqlite3.connect('igloo.dat')
 	c = conn.cursor()
-	c.execute('select id from eskimo_currencies where currency=?;', (cur,))
+	c.execute('select id from eskimo_currencies where currency=?;', (cur.upper(),))
 	if c.fetchone() is not None:
-		print(cur + ' already exists in the system')
+		print(cur.upper() + ' already exists in the system')
 		conn.close()
 		return
 	longName = raw_input('Enter the full name of the currency : ').capitalize().strip()
@@ -35,35 +44,25 @@ def addAlt():
 	c.execute('select id from eskimo_versions where version=?;', (versionInt,))
 	version = c.fetchone()
 	if version is None:
-		print('Version ' + str(version) + ' does not exist in the system')
-	c.execute('insert into eskimo_currencies (currency, longName, version) values (?,?,?);', (cur, longName, version[0]))
-	print(longName + ' is version ' + str(version))
+		print('Version ' + str(version[0]) + ' does not exist in the system')
+	c.execute('insert into eskimo_currencies (currency, longName, version) values (?,?,?);', (cur.upper(), longName, version[0]))
+	print(longName + ' is version ' + str(version[0]))
 	conn.commit()
 	conn.close()
 	return
-
-def scanPrivKey(privK):
-	hexK = base58_to_hex(privK)
-	prefix = hexK[0:3]
-	i = 3
-	while int(prefix, 16) < 128:
-		prefix += hexK[i]
-		i += 1
-	return int(prefix, 16)-128
 	
-def editAlt():
-	cur = raw_input('Enter the currency abbreviation to edit : ').upper().strip()
+def editAlt(cur):
 	if cur == '':
 		return False
-	conn = sqlite3.connect('eskimo.db')
+	conn = sqlite3.connect('igloo.dat')
 	c = conn.cursor()
-	c.execute('select id,currency,longName,version from eskimo_currencies where currency=?;', (cur, ))
+	c.execute('select id,currency,longName,version from eskimo_currencies where currency=?;', (cur.upper(), ))
 	curId = c.fetchone()
 	if curId is None:
-		print(cur + ' doesn\'t exist in the system')
+		print(cur.upper() + ' doesn\'t exist in the system')
 		return False
 	newCur = raw_input('Enter the new currency abbreviation (' + curId[1] + ') : ').upper().strip()
-	newCur = cur if newCur == '' else newCur
+	newCur = curId[1] if newCur == '' else newCur
 	newLongName = raw_input('Enter the new full name (' + curId[2] + ') : ').capitalize().strip()
 	newLongName = curId[2] if newLongName == '' else newLongName
 	imp = raw_input('Would you like to scan a different private key? (').lower().strip()
@@ -85,5 +84,5 @@ def editAlt():
 	c.execute('update eskimo_currencies set currency=?, longName=?, version=? where id=?;', (newCur, newLongName, newVersion, curId[0]))
 	conn.commit()
 	conn.close()
-	print('currency saved')
+	print(newCur + ' saved')
 	return True
