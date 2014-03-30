@@ -59,7 +59,7 @@ def generate(cur):
 	conn.commit()
 	conn.close() 
 	print('')
-	print(version[4] + ' Address : ' + publicAddress + '\n')
+	print(version[4] + ' Address : ' + publicAddress)
 	#uncomment out the line below to show the WIF private key upon creation
 	#print(str(privateKey2Wif(privateKey, version[0])))
 	return	
