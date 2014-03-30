@@ -3,28 +3,28 @@ from input import get
 from output import out
 import hashlib
 
-def keyboard_passphrase(turn=0, quiet=False):  # this can't really be "quiet"
-    progress_step = 0
-    pretty_progress = ['\b*', '\bo', '\bO']
-    keypress = _Getch()
-    single_key = passw = ''
-    msg = ' Enter your wallet passphrase (will not appear)......'
-    if turn != 0:
-        msg = ' Re-enter to verify your wallet passphrase......'
-    prnt(msg)
-
-    while single_key != "\n" and single_key != chr(13):
-        while True:
-            single_key = keypress()
-            if single_key != '':
-                break
-        #print ord(single_key)
-        if single_key != "\n" and single_key != chr(13):
-            passw += single_key
-        prnt(pretty_progress[progress_step % 3], quiet)
-        progress_step += 1
-    prnt('\b\n', quiet)
-    return passw
+def keyboard_passphrase(turn=0):
+	progress_step = 0
+	pretty_progress = ['\b*', '\bo', '\bO']
+	keypress = get._Getch()
+	single_key = passw = ''
+	msg = ' Enter your passphrase (will not appear)......'
+	if turn != 0:
+	    msg = ' Re-enter to verify your passphrase......'
+	print(msg)
+	
+	while single_key != "\n" and single_key != chr(13):
+	    while True:
+	        single_key = keypress()
+	        if single_key != '':
+	            break
+       
+	    if single_key != "\n" and single_key != chr(13):
+	        passw += single_key
+	    print(pretty_progress[progress_step % 3])
+	    progress_step += 1
+	print('\b')
+	return passw
 	
 def keyboardEntropy(keynum=64):
     """

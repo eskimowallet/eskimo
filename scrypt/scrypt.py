@@ -156,7 +156,7 @@ def smix(b, n, r=8):
     return ''.join(out)
 
 
-def scrypt(password, salt, n, r, p, buflen=64, quiet=False):
+def scrypt(password, salt, n, r, p, buflen=64):
     mflen = 2 * r * 4 * BLOCK_WORDS
     t = pbkdf(password, salt, 1, p * mflen, digestmod=hashlib.sha256)
     b = []
@@ -166,7 +166,7 @@ def scrypt(password, salt, n, r, p, buflen=64, quiet=False):
         t = t[mflen:]
 
     for i in range(p):
-        prnt('stage ' + str(i+1) + ' of ' + str(p) + '...\n', quiet)
+        print('stage ' + str(i+1) + ' of ' + str(p))
         b[i] = smix(b[i], n, r=r)
     return pbkdf(password, ''.join(b), 1, buflen, digestmod=hashlib.sha256)
 

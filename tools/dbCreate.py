@@ -2,15 +2,16 @@ import sqlite3
 
 def buildDB():
 
-	conn = sqlite3.connect('eskimo.db')
+	conn = sqlite3.connect('igloo.dat')
 	c = conn.cursor()
 
 	#create the tables
 	c.execute('create table eskimo_versions (id integer primary key not null, version int, prefix varchar(255), length integer);')
 	c.execute('create table eskimo_currencies (id integer primary key not null, currency varchar(255), longName varchar(255), version integer, foreign key(version) references eskimo_versions(id));')
-	c.execute('create table eskimo_privK (id integer primary key not null, privK varchar(255), currency integer, foreign key(currency) references eskimo_currencies(id));')
+	c.execute('create table eskimo_privK (id integer primary key not null, privK varchar(255), currency integer, bip varchar(255), foreign key(currency) references eskimo_currencies(id));')
 	c.execute('create table eskimo_addresses (id integer primary key not null, address varchar(255), currency integer, foreign key(currency) references eskimo_currencies(id));')
-	c.execute('create table eskimo_master (id integer primary key not null, address integer, privK integer, foreign key(address) references eskimo_addresses(id), foreign key(privK) references eskimo_privK(id));') 
+	c.execute('create table eskimo_master (id integer primary key not null, address integer, privK integer, foreign key(address) references eskimo_addresses(id), foreign key(privK) references eskimo_privK(id));')
+	c.execute('create table eskimo_settings (id integer primary key not null, name varchar(255), value varchar(255));') 
 
 	#load the known data about version numbers
 	c.execute('insert into eskimo_versions (version, prefix, length) VALUES (?,?,?);', (0,'1',34))
@@ -160,8 +161,37 @@ def buildDB():
 	c.execute('insert into eskimo_versions (version, prefix, length) VALUES (?,?,?);', (144,'z|2',34))
 	c.execute('insert into eskimo_versions (version, prefix, length) VALUES (?,?,?);', (145,'2',35))
 
+	#set the holder for the encryption passphrase
+	c.execute('insert into eskimo_settings (name) values (?);', ('encryption_passphrase',))
 
 	conn.commit()
 	conn.close()
 
 	return
+	
+from input import inp
+
+def setPwd(message=0):
+	if message == 0:
+		print('Welcome to eskimo')
+		print('you will be asked to provide a password to secure the system.')
+		print('keep this safe as your eskimo database will be encrypted using it.')
+		print('if you forget the password, all your private keys will effectively be lost.')
+	if message == 1:
+		print('no eskimo passphrase was found. please set a new one.')
+	passphrase1 = 'pass1'
+	passphrase2 = 'pass2'
+	while passphrase1 != passphrase2 or len(passphrase1) < 1:
+		passphrase1 = inp.keyboard_passphrase()
+		passphrase2 = inp.keyboard_passphrase(2)
+		if passphrase1 != passphrase2:
+	    		print('The passphrases entered did not match!')
+		elif len(passphrase1) < 1:
+	    		print('No passphrase was entered!')
+	conn = sqlite3.connect('igloo.dat')
+	c = conn.cursor()
+	c.execute('update eskimo_settings set value=? where name=?;', (passphrase1, 'encryption_passphrase'))
+	conn.close()
+	print('password saved')
+	return		
+		

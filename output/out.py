@@ -1,5 +1,4 @@
 from sys import stdout
-import sqlite3
 
 def prnt(printstring):
     	"""

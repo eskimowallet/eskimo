@@ -33,14 +33,8 @@ def base58Encode(r160, magicbyte=0, prefix=1):
     return str(prefix) * leadingzbytes + enc.encode(enc.decode(inp_fmtd + checksum, 256), 58, 0)
 
 
-def sxor(s1, s2):
-    """ XOR strings
-    """
-    return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
-    
- 
-def generate(cur):
-	conn = sqlite3.connect('eskimo.db')
+def generate(cur, bip=False):
+	conn = sqlite3.connect('igloo.dat')
 	c = conn.cursor()
 	c.execute('select v.version,v.prefix,v.length,c.id,c.longName from eskimo_versions as v inner join eskimo_currencies as c on c.version = v.id where c.currency=?;', (cur.upper(),))
 	version = c.fetchone()
@@ -51,23 +45,21 @@ def generate(cur):
 	publicKey = privateKey2PublicKey(privateKey)
 	publicAddress = publicKey2Address(publicKey, version[0], version[1])
 	
-	c.execute('insert into eskimo_privK (privK, currency) values (?,?);', (str(privateKey).encode('base64','strict'), version[3]))
+	c.execute('insert into eskimo_privK (privK, currency, bip) values (?,?,?);', (str(privateKey).encode('base64','strict'), version[3], str(False)))
 	privKid = c.lastrowid
 	c.execute('insert into eskimo_addresses (address, currency) values (?,?);', (publicAddress.encode('base64','strict'), version[3]))
 	addId = c.lastrowid
 	c.execute('insert into eskimo_master(address, privK) values (?,?);', (addId, privKid))
 	conn.commit()
-	conn.close() 
+	conn.close()
 	print('')
 	print(version[4] + ' Address : ' + publicAddress)
 	#uncomment out the line below to show the WIF private key upon creation
 	#print(str(privateKey2Wif(privateKey, version[0])))
 	return	
 	
-def dumpPrivKey(raw=0):
-	addressIn = raw_input('Enter the address to dump the private key : ')
-	print('')
-	conn = sqlite3.connect('eskimo.db')
+def dumpPrivKey(addressIn,raw=0):
+	conn = sqlite3.connect('igloo.dat')
 	c = conn.cursor()
 	c.execute('select p.privK,c.longName,v.version from eskimo_privK as p inner join eskimo_master as m on m.privK = p.id inner join eskimo_addresses as a on m.address = a.id inner join eskimo_currencies as c on p.currency = c.id inner join eskimo_versions as v on c.version = v.id where a.address = ?;', (addressIn.encode('base64', 'strict'),))
 	privK = c.fetchone()

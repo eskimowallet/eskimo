@@ -1,4 +1,5 @@
 *.pyc
 */*.pyc
-*.db
+*.dat
 *.json
+iceblock
