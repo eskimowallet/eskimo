@@ -100,4 +100,4 @@ try:
 except KeyboardInterrupt:
     while not database.encrypt(passW.password):
                 database.encrypt(passW.password)
-    sys.exit() 
+    sys.exit()
