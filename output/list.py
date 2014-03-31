@@ -1,11 +1,11 @@
-import sqlite3
+from tools import db
 
 def showAddresses(cur):
-	conn = sqlite3.connect('igloo.dat')
+	conn = db.open()
 	c = conn.cursor()
 	c.execute('select a.address from eskimo_addresses as a inner join eskimo_currencies as c on a.currency = c.id where c.currency = ?;', (cur.upper(),))
 	addresses = c.fetchall()
-	conn.close()
+	db.close(conn)
 	if not addresses:
 		print('No addresses found for ' + cur.upper())
 		return False
@@ -15,11 +15,11 @@ def showAddresses(cur):
 	return True
 	
 def showCurrencies():
-	conn = sqlite3.connect('igloo.dat')
+	conn = db.open()
 	c = conn.cursor()
 	c.execute('select * from eskimo_currencies;')
 	currencies = c.fetchall()
-	conn.close()
+	db.close(conn)
 	if not currencies:
 		print('No currencies exist in the system')
 		return False

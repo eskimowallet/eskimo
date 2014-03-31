@@ -1,6 +1,6 @@
-from rand import rand
-from input import get
-from output import out
+import rand.rand as rand
+import input.get as get
+import output.out as out
 import hashlib
 
 def keyboard_passphrase(turn=0):
@@ -8,9 +8,9 @@ def keyboard_passphrase(turn=0):
 	pretty_progress = ['\b*', '\bo', '\bO']
 	keypress = get._Getch()
 	single_key = passw = ''
-	msg = ' Enter your passphrase (will not appear)......'
+	msg = 'Enter your password (will not appear)......'
 	if turn != 0:
-	    msg = ' Re-enter to verify your passphrase......'
+	    msg = 'Re-enter to verify your password......'
 	print(msg)
 	
 	while single_key != "\n" and single_key != chr(13):
@@ -21,7 +21,7 @@ def keyboard_passphrase(turn=0):
        
 	    if single_key != "\n" and single_key != chr(13):
 	        passw += single_key
-	    print(pretty_progress[progress_step % 3])
+	    out.prnt(pretty_progress[progress_step % 3])
 	    progress_step += 1
 	print('\b')
 	return passw

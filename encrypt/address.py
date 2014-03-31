@@ -4,7 +4,7 @@ from elip import elip
 from rand import rand
 from input import inp
 from output import out
-import sqlite3
+from tools import db
 
 def privateKey2Wif(privateKey, version=0):
 	return base58Encode(enc.encode(privateKey, 256, 32) + '\x01', (128+version))
@@ -59,10 +59,11 @@ def generate(cur, bip=False):
 	return	
 	
 def dumpPrivKey(addressIn,raw=0):
-	conn = sqlite3.connect('igloo.dat')
+	conn = db.open()
 	c = conn.cursor()
 	c.execute('select p.privK,c.longName,v.version from eskimo_privK as p inner join eskimo_master as m on m.privK = p.id inner join eskimo_addresses as a on m.address = a.id inner join eskimo_currencies as c on p.currency = c.id inner join eskimo_versions as v on c.version = v.id where a.address = ?;', (addressIn.encode('base64', 'strict'),))
 	privK = c.fetchone()
+	db.close(conn)
 	if privK is None:
 		print('No matching private key was found')
 		return False
