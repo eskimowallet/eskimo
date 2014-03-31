@@ -1,6 +1,7 @@
-import sqlite3
 import json
 import os.path
+import sqlite3
+
 
 def exportAlts():
 	conn = sqlite3.connect('igloo.dat')

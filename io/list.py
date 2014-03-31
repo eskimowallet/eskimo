@@ -1,4 +1,4 @@
-from tools import db
+import system.db as db
 
 def showAddresses(cur):
 	conn = db.open()

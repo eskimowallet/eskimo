@@ -1,4 +1,5 @@
-import input.inp as inp
+import io.inp as inp
+import time
 
 class passW:
     
@@ -6,28 +7,27 @@ class passW:
     
     def setPass(self):
         print('Welcome to eskimo')
+        time.sleep(1)
         print('To encrypt your database please enter a password')
+        time.sleep(2)
         print('keep this password safe as it is not stored anywhere')
+        time.sleep(2)
         print('if you loose it, you will loose all your private keys')
         print('')
+        time.sleep(2)
         pass1 = 'pass1' 
         pass2 = 'pass2'
-        while pass1 != pass2 or len(pass1) < 1:
+        while pass1 != pass2:
             pass1 = inp.keyboard_passphrase()
             pass2 = inp.keyboard_passphrase(2)
             if pass1 != pass2:
                 print('The passwords entered did not match!')
-            elif len(pass1) < 1:
-                print('No password was entered!')
         self.password = pass1
         print('password has been set')
         return
     
     def getPass(self):
-        while self.password == '':
-            self.password = inp.keyboard_passphrase()
-            if self.password == '':
-                print('no password was entered')
+        self.password = inp.keyboard_passphrase()
         return self.password
         
     def editPass(self):

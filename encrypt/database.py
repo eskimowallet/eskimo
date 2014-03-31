@@ -1,10 +1,15 @@
 from hashlib import md5
-import aes.aes as aes
-import rand.rand as rand
-import tools.db as db
 import os
 
+import encrypt.aes as aes
+import num.rand as rand
+import system.db as db
+
+
 def derive_key_and_iv(password, salt, key_length, iv_length):
+    '''
+        accept a password and salt and return hex key and iv values
+    '''
     d = d_i = ''
     while len(d) < key_length + iv_length:
         d_i = md5(d_i + password + salt).digest()
@@ -12,6 +17,9 @@ def derive_key_and_iv(password, salt, key_length, iv_length):
     return d[:key_length], d[key_length:key_length+iv_length]
 
 def encrypt(passW):
+    '''
+        encrypt the sqlite database
+    '''
     print('encrypting database. please wait...')
     bs = 128
     inFile = 'igloo.dat'
@@ -22,7 +30,7 @@ def encrypt(passW):
     salt = str(rand.clockrnd())[:(bs - len('Salted__'))]
     in_file = open('igloo.dat', 'rb')
     out_file = open('iceblock', 'wb')
-    key, iv = derive_key_and_iv(passW, salt, 32, bs)
+    key, iv = derive_key_and_iv(passW.password, salt, 32, bs)
     out_file.write('Salted__' + salt)
     finished = False
     while not finished:
@@ -38,17 +46,23 @@ def encrypt(passW):
     return db.testEnc()
 
 def decrypt(passW):
-    print('decrypting database. please wait...')
+    '''
+        decrypt the sqlite database
+        retry if decryption fails
+    '''
     bs = 128
     inFile = 'iceblock'
     outFile = 'igloo.dat'
     if not os.path.isfile(inFile) and os.path.isfile(outFile):
-        print('database is already encrypted')
-        return
+        if db.testDec():
+            print('database is already decrypted')
+            return
+    passW.getPass()
     in_file = open(inFile, 'rb')
     out_file = open(outFile, 'wb')
+    print('decrypting database. please wait...')
     salt = in_file.read(bs)[len('Salted__'):]
-    key, iv = derive_key_and_iv(passW, salt, 32, bs)
+    key, iv = derive_key_and_iv(passW.password, salt, 32, bs)
     next_chunk = ''
     finished = False
     while not finished:
@@ -60,5 +74,12 @@ def decrypt(passW):
         out_file.write(chunk)
     in_file.close()
     out_file.close()
-    os.remove(inFile)
-    return db.testDec()
+    if db.testDec():
+        os.remove(inFile)
+        return True
+    else:
+        print('incorrect password was entered')
+        print('')
+        os.remove(outFile)
+        decrypt(passW)
+        return False

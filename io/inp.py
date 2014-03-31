@@ -1,7 +1,8 @@
-import rand.rand as rand
-import input.get as get
-import output.out as out
 import hashlib
+
+import io.get as get
+import io.out as out
+import num.rand as rand
 
 def keyboard_passphrase(turn=0):
 	progress_step = 0

@@ -6,18 +6,19 @@ Cold storage crypto-currency address generator
 
 """
 
-import num.rand as rand
+import os.path
+import sys
+
+import encrypt.bip38 as bip38
+import encrypt.database as database
 import io.inp as inp
 import io.get as get
 import io.list as list
+import num.rand as rand
 import system.address as address
-import encrypt.bip38 as bip38
-import encrypt.database as database
-import os.path
-import system.dbCreate as dbCreate
 import system.alts as alts
 import system.curData as curData
-import sys
+import system.dbCreate as dbCreate
 from system.settings import passW
 passW = passW()
 
@@ -30,8 +31,11 @@ if not os.path.isfile('igloo.dat') and not os.path.isfile('iceblock'):
 
 else:
     if not os.path.isfile('igloo.dat') and os.path.isfile('iceblock'):
-        while not database.decrypt(passW.getPass()):
-            database.decrypt(passW.getPass())
+        #decrypt the database if the encrypted version exists
+        database.decrypt(passW)
+    else:
+        #otherwise get the password so that password encryption can take place
+        passW.getPass()
     
 try:
 	
@@ -41,8 +45,7 @@ try:
         command = raw_input('Enter command >> ').lower().strip().split()
 
         if command[0] == 'exit':
-            while not database.encrypt(passW.password):
-                database.encrypt(passW.password)
+            database.encrypt(passW)
             sys.exit()
 
         elif command[0] == 'help':
@@ -54,11 +57,10 @@ try:
             continue
             
         elif command[0] == 'dumpprivkey':
+            if len(command) < 2:
+                print('dumpprivkey requires an address as its first parameter')
+                continue
             address.dumpPrivKey(command[1])
-            continue
-
-        elif command[0] == 'dumpprivkeyraw':
-            address.dumpPrivKey(command[1], 1)
             continue		
 
         elif command[0] == 'entropycheck':
@@ -66,6 +68,9 @@ try:
             continue
 
         elif command[0] == 'listaddr':
+            if len(command) < 2:
+                print('listaddr requires a currency abbreviation as its first parameter')
+                continue
             list.showAddresses(command[1])
             continue
 
@@ -74,10 +79,16 @@ try:
             continue
 
         elif command[0] == 'addcur':
+            if len(command) < 2:
+                print('addcur requires a currency abbreviation as its first parameter')
+                continue
             alts.addAlt(command[1])
             continue
             
         elif command[0] == 'editcur':
+            if len(command) < 2:
+                print('editcur requires a currency abbreviation as its first parameter')
+                continue
             alts.editAlt(command[1])
             continue
             
@@ -90,14 +101,16 @@ try:
             continue
 
         elif command[0] == 'gen':
-            address.generate(command[1], command[2])
+            if len(command) < 2:
+                print('gen requires a currency abbreviation as its first parameter')
+                continue
+            address.generate(command[1])
             continue
 
         else:
-            print('command not recognised')
+            print(command[0] + ' was not recognised as a command')
             continue
 
 except KeyboardInterrupt:
-    while not database.encrypt(passW.password):
-                database.encrypt(passW.password)
+    database.encrypt(passW)
     sys.exit()

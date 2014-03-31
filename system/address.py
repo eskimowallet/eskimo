@@ -1,10 +1,12 @@
-from encode import enc
 import hashlib
-from elip import elip
-from rand import rand
-from input import inp
-from output import out
-from tools import db
+
+import io.inp as inp
+import io.out as out
+import encrypt.bip38 as bip38
+import num.elip as elip
+import num.enc as enc
+import num.rand as rand
+import system.db as db
 
 def privateKey2Wif(privateKey, version=0):
 	return base58Encode(enc.encode(privateKey, 256, 32) + '\x01', (128+version))
@@ -34,29 +36,54 @@ def base58Encode(r160, magicbyte=0, prefix=1):
 
 
 def generate(cur, bip=False):
-	conn = sqlite3.connect('igloo.dat')
-	c = conn.cursor()
-	c.execute('select v.version,v.prefix,v.length,c.id,c.longName from eskimo_versions as v inner join eskimo_currencies as c on c.version = v.id where c.currency=?;', (cur.upper(),))
-	version = c.fetchone()
-	if version is None:
-		print(cur.upper() + ' is not currently listed as a currency')
-		return False
-	privateKey = rand.randomKey(inp.keyboardEntropy())
-	publicKey = privateKey2PublicKey(privateKey)
-	publicAddress = publicKey2Address(publicKey, version[0], version[1])
-	
-	c.execute('insert into eskimo_privK (privK, currency, bip) values (?,?,?);', (str(privateKey).encode('base64','strict'), version[3], str(False)))
-	privKid = c.lastrowid
-	c.execute('insert into eskimo_addresses (address, currency) values (?,?);', (publicAddress.encode('base64','strict'), version[3]))
-	addId = c.lastrowid
-	c.execute('insert into eskimo_master(address, privK) values (?,?);', (addId, privKid))
-	conn.commit()
-	conn.close()
-	print('')
-	print(version[4] + ' Address : ' + publicAddress)
-	#uncomment out the line below to show the WIF private key upon creation
-	#print(str(privateKey2Wif(privateKey, version[0])))
-	return	
+    '''
+        public and private key generator.
+        optional BIP0038 encryption
+    '''
+    #check that the given currency is in the system
+    conn = db.open()
+    c = conn.cursor()
+    #pull the version details from the database
+    c.execute('select v.version,v.prefix,v.length,c.id,c.longName from eskimo_versions as v inner join eskimo_currencies as c on c.version = v.id where c.currency=?;', (cur.upper(),))
+    version = c.fetchone()
+    if version is None:
+        print(cur.upper() + ' is not currently listed as a currency')
+        return False
+    #generate the private and public keys
+    privateKey = rand.randomKey(inp.keyboardEntropy())
+    publicKey = privateKey2PublicKey(privateKey)
+    publicAddress = publicKey2Address(publicKey, version[0], version[1])
+    #optional BIP0038 encryption
+    print('creation of a BIP0038 encrypted private key can take a long time (~10 minutes)')
+    skip = raw_input('do you want to skip BIP0038 encryption? ').lower().strip()
+    if skip == 'n':
+        bip38pass1 = 'bip38pass1' 
+        bip38pass2 = 'bip38pass2'
+        while bip38pass1 != bip38pass2 or len(bip38pass1) < 1:
+            bip38pass1 = inp.keyboard_passphrase()
+            bip38pass2 = inp.keyboard_passphrase(2)
+            if bip38pass1 != bip38pass2:
+                print('The passphrases entered did not match!')
+            elif len(bip38pass1) < 1:
+                print('No passphrase was entered!')
+        reminder = raw_input('Enter an optional reminder for your password : ').strip()
+        privK = bip38.encrypt(privateKey, publicAddress, bip38pass1, version[0], version[1])
+        isBip = True
+    else:
+        privK = privateKey
+        isBip = False
+    #save details to the database
+    c.execute('insert into eskimo_privK (privK, currency) values (?,?);', (str(privK).encode('base64','strict'), version[3]))
+    privKid = c.lastrowid
+    c.execute('insert into eskimo_addresses (address, currency) values (?,?);', (publicAddress.encode('base64','strict'), version[3]))
+    addId = c.lastrowid
+    c.execute('insert into eskimo_master (address, privK) values (?,?);', (addId, privKid))
+    if isBip is True:
+        c.execute('insert into eskimo_bip (privK, reminder) values (?,?);', (privKid, reminder))
+    db.close(conn)
+    print('')
+    print(version[4] + ' Address : ' + publicAddress)
+    return	
 	
 def dumpPrivKey(addressIn,raw=0):
 	conn = db.open()

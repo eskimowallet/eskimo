@@ -1,7 +1,8 @@
 import hashlib
-from encode import enc
-from elip import elip
-from output import out
+
+import io.out as out
+import num.elip as elip
+import num.enc as enc
 
 def clockbase():
     """

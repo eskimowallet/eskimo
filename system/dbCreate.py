@@ -1,5 +1,6 @@
 import sqlite3
-from encrypt import database
+import encrypt.database as database
+import io.inp as inp
 
 def buildDB():
 
@@ -12,7 +13,7 @@ def buildDB():
     c.execute('create table eskimo_privK (id integer primary key not null, privK varchar(255), currency integer, bip varchar(255), foreign key(currency) references eskimo_currencies(id));')
     c.execute('create table eskimo_addresses (id integer primary key not null, address varchar(255), currency integer, foreign key(currency) references eskimo_currencies(id));')
     c.execute('create table eskimo_master (id integer primary key not null, address integer, privK integer, foreign key(address) references eskimo_addresses(id), foreign key(privK) references eskimo_privK(id));')
-    c.execute('create table eskimo_settings (id integer primary key not null, name varchar(255), value varchar(255));') 
+    c.execute('create table eskimo_bip (id integer primary key not null, privKey integer, reminder varchar(255), foreign key(privK) references eskimo_privK(id));')
 
     #load the known data about version numbers
     c.execute('insert into eskimo_versions (version, prefix, length) VALUES (?,?,?);', (0,'1',34))
@@ -166,8 +167,6 @@ def buildDB():
     conn.close()
 
     return
-	
-from input import inp
 
 def setPwd(message=0):
 	if message == 0:
