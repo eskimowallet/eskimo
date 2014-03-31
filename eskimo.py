@@ -6,19 +6,19 @@ Cold storage crypto-currency address generator
 
 """
 
-import rand.rand as rand
-import input.inp as inp
-import input.get as get
-import output.list as list
-import encrypt.address as address
+import num.rand as rand
+import io.inp as inp
+import io.get as get
+import io.list as list
+import system.address as address
 import encrypt.bip38 as bip38
 import encrypt.database as database
 import os.path
-import tools.dbCreate as dbCreate
-import tools.alts as alts
-import tools.curData as curData
+import system.dbCreate as dbCreate
+import system.alts as alts
+import system.curData as curData
 import sys
-from settings.settings import passW
+from system.settings import passW
 passW = passW()
 
 #build the database if it doesn't exist
