@@ -7,6 +7,7 @@ import num.elip as elip
 import num.enc as enc
 import num.rand as rand
 import system.db as db
+import random
 
 def privateKey2Wif(privateKey, version=0):
 	return base58Encode(enc.encode(privateKey, 256, 32) + '\x01', (128+version))
@@ -19,20 +20,20 @@ def privateKey2PublicKey(priv):
     return '0' + str(2 + (pub[1] % 2)) + enc.encode(pub[0], 16, 64)
 
 
-def publicKey2Address(publicKey, version=0, prefix=1):
+def publicKey2Address(publicKey, version=0, prefix=1, length=0):
     """ Compressed ECC public key hex to address
     """
-    return base58Encode(hashlib.new('ripemd160', hashlib.sha256(publicKey.decode('hex')).digest()).digest(), (0+version), prefix)
+    return base58Encode(hashlib.new('ripemd160', hashlib.sha256(publicKey.decode('hex')).digest()).digest(), (0+version), prefix, length)
 
 
-def base58Encode(r160, magicbyte=0, prefix=1):
+def base58Encode(r160, magicbyte=0, prefix=1, length=0):
     """ Base58 encoding w leading zero compact
     """
     from re import match as re_match
     inp_fmtd = chr(int(magicbyte)) + r160
     leadingzbytes = len(re_match('^\x00*', inp_fmtd).group(0))
     checksum = hashlib.sha256(hashlib.sha256(inp_fmtd).digest()).digest()[:4]
-    return str(prefix) * leadingzbytes + enc.encode(enc.decode(inp_fmtd + checksum, 256), 58, 0)
+    return str(prefix) * leadingzbytes + enc.encode(enc.decode(inp_fmtd + checksum, 256), 58, length)
 
 
 def generate(cur, bip=False):
@@ -49,22 +50,25 @@ def generate(cur, bip=False):
     if version is None:
         print(cur.upper() + ' is not currently listed as a currency')
         return False
+    #randomly choose a prefix if multiples exist
+    prefixes = version[1].split('|') 
+    prefix = prefixes[random.randint(1, len(prefixes))] 
     #generate the private and public keys
     privateKey = rand.randomKey(inp.keyboardEntropy())
     publicKey = privateKey2PublicKey(privateKey)
-    publicAddress = publicKey2Address(publicKey, version[0], version[1])
+    publicAddress = publicKey2Address(publicKey, version[0], prefix,  version[2])
     #optional BIP0038 encryption
     print('creation of a BIP0038 encrypted private key can take a long time (~10 minutes)')
     skip = raw_input('do you want to skip BIP0038 encryption? ').lower().strip()
     if skip == 'n':
-        bip38pass1 = 'bip38pass1' 
-        bip38pass2 = 'bip38pass2'
-        while bip38pass1 != bip38pass2 or len(bip38pass1) < 1:
-            bip38pass1 = inp.keyboard_passphrase()
-            bip38pass2 = inp.keyboard_passphrase(2)
-            if bip38pass1 != bip38pass2:
-                print('The passphrases entered did not match!')
-            elif len(bip38pass1) < 1:
+        bipPass1 = 'pass1' 
+        bipPass2 = 'pass2'
+        while bipPass1 != bipPass2 or len(bipPass1) < 1:
+            bipPass1 = inp.secure_passphrase(' enter your BIP0038 passphrase..... ')
+            bipPass2 = inp.keyboard_passphrase(' re-enter your passphrase to confirm..... ')
+            if bipPass2 != bipPass2:
+                print('The passphrases entered did not match.')
+            elif len(bipPass1) < 1:
                 print('No passphrase was entered!')
         reminder = raw_input('Enter an optional reminder for your password : ').strip()
         privK = bip38.encrypt(privateKey, publicAddress, bip38pass1, version[0], version[1])
@@ -92,12 +96,4 @@ def dumpPrivKey(addressIn,raw=0):
 	privK = c.fetchone()
 	db.close(conn)
 	if privK is None:
-		print('No matching private key was found')
-		return False
-	if raw == 1:
-		print('Raw Private Key for ' + privK[1] + ' address ' + addressIn + ' is:')
-		print(str(privK[0]).decode('base64', 'strict'))
-	else:
-		print('WIF Private Key for ' + privK[1] + ' address ' + addressIn + ' is:')
-		print(privateKey2Wif(long(str(privK[0]).decode('base64', 'strict')), privK[2]))
-	return 	 
+		print('No matching private key was fou
