@@ -43,33 +43,66 @@ def encrypt(priv, addr, passphrase, version=0, prefix=1):
 	encrypted_check = hashlib.sha256(hashlib.sha256(encrypted_privkey).digest()).digest()[:4]
 	return enc.b58encode(encrypted_privkey + encrypted_check)
 	
+def bad_decrypt(encrypted_privkey,passphrase):
+	'''
+	BIP0038 non-ec-multiply decryption. Returns hex privkey.
+	'''
+	d = str(enc.decode(encrypted_privkey, 58))
+	print('d = ' + d)
+	d = d[2:]
+	print('d = ' + d)
+	flagbyte = d[0:1]
+	d = d[1:]
+	print('d = ' + d)
+	# respect flagbyte, return correct pair
+	if flagbyte == '\xc0':
+		compressed = False
+	if flagbyte == '\xe0':
+		compressed = True
+	addresshash = d[0:4]
+	d = d[4:-4]
+	print('d = ' + d)
+	print('addresshash = ' + addresshash)
+	key = scrypt.scrypt(passphrase,addresshash, 16384, 8, 1)
+	print('key = ' + key)
+	derivedhalf1 = key[0:32]
+	derivedhalf2 = key[32:64]
+	encryptedhalf1 = d[0:16]
+	encryptedhalf2 = d[16:32]
+	decryptedhalf2 = aes.decryptData(derivedhalf2, encryptedhalf2)
+	decryptedhalf1 = aes.decryptData(derivedhalf2, encryptedhalf1)
+	priv = decryptedhalf1 + decryptedhalf2
+	return priv, addresshash
+		
 def decrypt(encrypted_privkey,passphrase):
-		'''
-		BIP0038 non-ec-multiply decryption. Returns hex privkey.
-		'''
-		d = str(enc.decode(encrypted_privkey, 58))
-		print('d = ' + d)
-		d = d[2:]
-		print('d = ' + d)
-		flagbyte = d[0:1]
-		d = d[1:]
-		print('d = ' + d)
-		# respect flagbyte, return correct pair
-		if flagbyte == '\xc0':
-			compressed = False
-		if flagbyte == '\xe0':
-			compressed = True
-		addresshash = d[0:4]
-		d = d[4:-4]
-		print('d = ' + d)
-		print('addresshash = ' + addresshash)
-		key = scrypt.scrypt(passphrase,addresshash, 16384, 8, 1)
-		print('key = ' + key)
-		derivedhalf1 = key[0:32]
-		derivedhalf2 = key[32:64]
-		encryptedhalf1 = d[0:16]
-		encryptedhalf2 = d[16:32]
-		decryptedhalf2 = aes.decryptData(derivedhalf2, encryptedhalf2)
-		decryptedhalf1 = aes.decryptData(derivedhalf2, encryptedhalf1)
-		priv = decryptedhalf1 + decryptedhalf2
-		return priv, addresshash
+	'''BIP0038 non-ec-multiply decryption. Returns WIF privkey.'''
+	d = enc.b58decode(encrypted_privkey)
+	d = d[2:]
+	flagbyte = d[0:1]
+	d = d[1:]
+	if flagbyte == '\xc0':
+		compressed = False
+	if flagbyte == '\xe0':
+		compressed = True
+	addresshash = d[0:4]
+	d = d[4:-4]
+	key = scrypt.scrypt(passphrase,addresshash, 16384, 8, 1)
+	derivedhalf1 = key[0:32]
+	derivedhalf2 = key[32:64]
+	encryptedhalf1 = d[0:16]
+	encryptedhalf2 = d[16:32]
+	decryptedhalf2 = aes.decryptData(derivedhalf2, encryptedhalf2)
+	decryptedhalf1 = aes.decryptData(derivedhalf2, encryptedhalf1)
+	priv = decryptedhalf1 + decryptedhalf2
+	print(priv)
+	#priv = binascii.unhexlify('%064x' % (long(binascii.hexlify(priv), 16) ^ long(binascii.hexlify(derivedhalf1), 16)))
+	#pub = privtopub(priv)
+	#if compressed:
+	#	pub = encode_pubkey(pub,'hex_compressed')
+	#	wif = encode_privkey(priv,'wif_compressed')
+	#else:
+	#	wif = encode_privkey(priv,'wif')
+	#addr = pubtoaddr(pub)
+	#if hashlib.sha256(hashlib.sha256(addr).digest()).digest()[0:4] != addresshash:
+	#	print('Addresshash verification failed! Password is likely incorrect.')
+	#return wif
