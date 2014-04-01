@@ -18,8 +18,8 @@ class passW:
         pass1 = 'pass1' 
         pass2 = 'pass2'
         while pass1 != pass2:
-            pass1 = inp.keyboard_passphrase()
-            pass2 = inp.keyboard_passphrase(2)
+            pass1 = inp.secure_passphrase('Enter your database encryption password')
+            pass2 = inp.secure_passphrase('Enter it again to confirm' )
             if pass1 != pass2:
                 print('The passwords entered did not match!')
         self.password = pass1
@@ -27,16 +27,16 @@ class passW:
         return
     
     def getPass(self):
-        self.password = inp.keyboard_passphrase()
+        self.password = inp.secure_passphrase('Enter your database password to decrypt the database')
         return self.password
         
     def editPass(self):
-        currentpass = raw_input('Enter your current password : ')
+        currentpass = inp.secure_passphrase('Enter your current password : ')
         if currentpass != self.password:
             print('incorrect password entered')
             return
-        new_pass = raw_input('Enter your new password : ')
-        new_pass2 = raw_input('and again : ')
+        new_pass = inp.secure_passphrase('Enter your new password : ')
+        new_pass2 = inp.secude_passphrase('Enter it again to confirm : ')
         if new_pass == new_pass2:
             self.password = new_pass
             print('password changed')

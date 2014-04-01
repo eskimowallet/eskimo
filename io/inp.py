@@ -4,14 +4,11 @@ import io.get as get
 import io.out as out
 import num.rand as rand
 
-def keyboard_passphrase(turn=0):
+def secure_passphrase(msg):
 	progress_step = 0
 	pretty_progress = ['\b*', '\bo', '\bO']
 	keypress = get._Getch()
 	single_key = passw = ''
-	msg = 'Enter your password (will not appear)......'
-	if turn != 0:
-	    msg = 'Re-enter to verify your password......'
 	print(msg)
 	
 	while single_key != "\n" and single_key != chr(13):
