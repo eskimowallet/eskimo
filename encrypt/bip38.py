@@ -76,7 +76,7 @@ def bad_decrypt(encrypted_privkey,passphrase):
 		
 def decrypt(encrypted_privkey,passphrase):
 	'''BIP0038 non-ec-multiply decryption. Returns WIF privkey.'''
-	d = enc.b58decode(encrypted_privkey)
+	d = str(enc.b58decode(encrypted_privkey))
 	d = d[2:]
 	flagbyte = d[0:1]
 	d = d[1:]
@@ -94,8 +94,9 @@ def decrypt(encrypted_privkey,passphrase):
 	decryptedhalf2 = aes.decryptData(derivedhalf2, encryptedhalf2)
 	decryptedhalf1 = aes.decryptData(derivedhalf2, encryptedhalf1)
 	priv = decryptedhalf1 + decryptedhalf2
-	print(priv)
-	#priv = binascii.unhexlify('%064x' % (long(binascii.hexlify(priv), 16) ^ long(binascii.hexlify(derivedhalf1), 16)))
+	print('priv = ' + priv)
+	priv = binascii.unhexlify('%064x' % (long(binascii.hexlify(priv), 16) ^ long(binascii.hexlify(derivedhalf1), 16)))
+	print('priv = ' + priv)
 	#pub = privtopub(priv)
 	#if compressed:
 	#	pub = encode_pubkey(pub,'hex_compressed')

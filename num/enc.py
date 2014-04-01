@@ -34,31 +34,18 @@ import hashlib
 __b58chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 __b58base = len(__b58chars)
 
-def b58decode(v, length=77):
-	""" decode v into a string of len bytes
-	"""
+def b58decode(encoded):
+    """
+    decodes base58 string 'encoded' to return integer
+    """
 
-	long_value = 0L
-	for (i, c) in enumerate(v[::-1]):
-		long_value += __b58chars.find(c) * (__b58base**i)
-
-	result = ''
-	while long_value >= 256:
-		div, mod = divmod(long_value, 256)
-		result = chr(mod) + result
-		long_value = div
-	result = chr(long_value) + result
-
-	nPad = 0
-	for c in v:
-		if c == __b58chars[0]: nPad += 1
-		else: break
-
-	result = chr(0)*nPad + result
-	if length is not None and len(result) != length:
-		return None
-
-	return result
+    value = 0
+    column_multiplier = 1;
+    for c in encoded[::-1]:
+        column = __b58chars.index(c)
+        value += column * column_multiplier
+        column_multiplier *= __b58base
+    return value
 	
 def get_code_string(base):
 	if base == 16:
