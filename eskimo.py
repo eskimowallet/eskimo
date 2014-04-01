@@ -24,93 +24,95 @@ passW = passW()
 
 #build the database if it doesn't exist
 if not os.path.isfile('igloo.dat') and not os.path.isfile('iceblock'):
-    passW.setPass()
-    dbCreate.buildDB()
+	passW.setPass()
+	dbCreate.buildDB()
 	#as this is likely a first run, scan for good entropy
 	#rand.platformCheck()	
 
 else:
-    if not os.path.isfile('igloo.dat') and os.path.isfile('iceblock'):
-        #decrypt the database if the encrypted version exists
-        database.decrypt(passW)
-    else:
-        #otherwise get the password so that password encryption can take place
-        passW.getPass()
-    
+	if not os.path.isfile('igloo.dat') and os.path.isfile('iceblock'):
+		#decrypt the database if the encrypted version exists
+		database.decrypt(passW)
+	else:
+		#otherwise get the password so that password encryption can take place
+		passW.getPass()
+	
 try:
 	
-    while True:
+	while True:
 		
-        print('')
-        command = raw_input('Enter command >> ').lower().strip().split()
+		print('')
+		command = raw_input('Enter command >> ').strip().split()
 
-        if command[0] == 'exit':
-            database.encrypt(passW)
-            sys.exit()
+		if command[0].lower() == 'exit':
+			database.encrypt(passW)
+			sys.exit()
 
-        elif command[0] == 'help':
-            list.help()
-            continue
-            
-        elif command[0] == 'setpass':
-            dbCreate.setPwd(2)
-            continue
-            
-        elif command[0] == 'dumpprivkey':
-            if len(command) < 2:
-                print('dumpprivkey requires an address as its first parameter')
-                continue
-            address.dumpPrivKey(command[1])
-            continue		
+		elif command[0].lower() == 'help':
+			list.help()
+			continue
+			
+		elif command[0].lower() == 'setpass':
+			dbCreate.setPwd(2)
+			continue
+			
+		elif command[0].lower() == 'dumpprivkey':
+			if len(command) < 2:
+				print('dumpprivkey requires an address as its first parameter')
+				continue
+			address.dumpPrivKey(command[1])
+			continue		
 
-        elif command[0] == 'entropycheck':
-            rand.platformCheck()
-            continue
+		elif command[0].lower() == 'entropycheck':
+			rand.platformCheck()
+			continue
 
-        elif command[0] == 'listaddr':
-            if len(command) < 2:
-                print('listaddr requires a currency abbreviation as its first parameter')
-                continue
-            list.showAddresses(command[1])
-            continue
+		elif command[0].lower() == 'listaddr':
+			if len(command) < 2:
+				print('listaddr requires a currency abbreviation as its first parameter')
+				continue
+			list.showAddresses(command[1])
+			continue
 
-        elif command[0] == 'listcur':
-            list.showCurrencies()
-            continue
+		elif command[0].lower() == 'listcur':
+			list.showCurrencies()
+			continue
 
-        elif command[0] == 'addcur':
-            if len(command) < 2:
-                print('addcur requires a currency abbreviation as its first parameter')
-                continue
-            alts.addAlt(command[1])
-            continue
-            
-        elif command[0] == 'editcur':
-            if len(command) < 2:
-                print('editcur requires a currency abbreviation as its first parameter')
-                continue
-            alts.editAlt(command[1])
-            continue
-            
-        elif command[0] == 'import':
-            curData.importAlts()
-            continue
-            
-        elif command[0] == 'export':
-            curData.exportAlts()
-            continue
+		elif command[0].lower() == 'addcur':
+			if len(command) < 2:
+				print('addcur requires a currency abbreviation as its first parameter')
+				continue
+			alts.addAlt(command[1])
+			continue
+			
+		elif command[0].lower() == 'editcur':
+			if len(command) < 2:
+				print('editcur requires a currency abbreviation as its first parameter')
+				continue
+			alts.editAlt(command[1])
+			continue
+			
+		elif command[0].lower() == 'import':
+			curData.importAlts()
+			continue
+			
+		elif command[0].lower() == 'export':
+			curData.exportAlts()
+			continue
 
-        elif command[0] == 'gen':
-            if len(command) < 2:
-                print('gen requires a currency abbreviation as its first parameter')
-                continue
-            address.generate(command[1])
-            continue
+		elif command[0].lower() == 'gen':
+			if len(command) < 2:
+				print('gen requires a currency abbreviation as its first parameter')
+				continue
+			address.generate(command[1])
+			continue
 
-        else:
-            print(command[0] + ' was not recognised as a command')
-            continue
+		else:
+			print(command[0] + ' was not recognised as a command')
+			continue
 
 except KeyboardInterrupt:
-    database.encrypt(passW)
-    sys.exit()
+	#naughty I know but this should ensure that the database gets encrypted if an unforeseen error occurs
+	print('caught exception : ' + str(sys.exc_info()[0]))
+	database.encrypt(passW)
+	sys.exit()

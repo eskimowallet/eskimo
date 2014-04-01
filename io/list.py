@@ -17,7 +17,7 @@ def showAddresses(cur):
 def showCurrencies():
 	conn = db.open()
 	c = conn.cursor()
-	c.execute('select * from eskimo_currencies;')
+	c.execute('select c.currency,c.longName,v.version from eskimo_currencies as c inner join eskimo_versions as v on c.version=v.id;')
 	currencies = c.fetchall()
 	db.close(conn)
 	if not currencies:
@@ -25,7 +25,7 @@ def showCurrencies():
 		return False
 	print('')
 	for currency in currencies:
-		print('{0: <5}'.format(str(currency[1])) + '   |   ' + '{0: >5}'.format(str(currency[2])))
+		print('{0: <5}'.format(str(currency[0])) + '   |   ' + '{0: >5}'.format(str(currency[1])) + '   |   ' + str(currency[2]))
 	return True
 	
 def help():
