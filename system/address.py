@@ -123,13 +123,17 @@ def dumpPrivKey(address):
 			bipPass1 = 'pass1' 
 			bipPass2 = 'pass2'
 			while bipPass1 != bipPass2 or len(bipPass1) < 1:
-				bipPass1 = inp.secure_passphrase('Enter your BIP0038 passphrase.....')
+				bipPass1 = inp.secure_passphrase('Enter your BIP0038 passphrase (' + bip[0] + ').....')
 				bipPass2 = inp.secure_passphrase('Re-enter your passphrase to confirm.....')
 				if bipPass1 != bipPass2:
 					print('The passphrases entered did not match.')
 				elif len(bipPass1) < 1:
 					print('No passphrase was entered!')
-			privK = bip38.decrypt(privK, bipPass1)
+			privK, addresshash = bip38.decrypt(privK, bipPass1)
+			print(str(privK) + ' - ' + str(addresshash))
+			if hashlib.sha256(hashlib.sha256(publicKey2Address(privateKey2PublicKey(privK))).digest()).digest()[0:4] != addresshash:
+				print('Addresshash Error')
+				return
 		else:
 			print('BIP0038 encrypted private key : ' + privK)
 			return True		

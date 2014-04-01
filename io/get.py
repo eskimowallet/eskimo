@@ -72,17 +72,17 @@ class _GetchMacCarbon:
 
 
 def flushKeybuffer(keypress):
+	import sys
+	sys.stdout.flush()
+	
 	if keypress.platform == 'windows':
 		import msvcrt
-		import sys
-		
-		sys.stdout.flush()
 		# Try to flush the buffer
 		while msvcrt.kbhit():
 			msvcrt.getch()
 	
 	else:
-		import curses
-		curses.flushinp()
+		from termios import tcflush, TCIOFLUSH
+		tcflush(sys.stdin, TCIOFLUSH)
 	
 	return

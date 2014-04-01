@@ -15,6 +15,7 @@ def encrypt(priv, addr, passphrase, version=0, prefix=1):
 	'''
 	
 	print('calculating BIP0038 encrypted private key...')
+	print(priv)
 	
 	#1 Take the first four bytes of SHA256(SHA256()) of the public address.
 	addrhash = hashlib.sha256(hashlib.sha256(addr).digest()).digest()[:4]  # salt
@@ -25,7 +26,7 @@ def encrypt(priv, addr, passphrase, version=0, prefix=1):
 	#		 (n, r, p are provisional and subject to consensus)
 	#	 b. Let's split the resulting 64 bytes in half, and call them derivedhalf1 and derivedhalf2.
 		# scrypt(password, salt, n, r, p, buflen):
-	scryptedkey = scrypt.scrypt(passphrase, addrhash, 16384, 8, 8, 64)
+	scryptedkey = scrypt.scrypt(passphrase, addrhash, 16384, 8, 1, 64)
 	half1 = scryptedkey[0:32]
 	half2 = scryptedkey[32:64]
 
@@ -47,9 +48,12 @@ def decrypt(encrypted_privkey,passphrase):
 		BIP0038 non-ec-multiply decryption. Returns hex privkey.
 		'''
 		d = str(enc.decode(encrypted_privkey, 58))
+		print('d = ' + d)
 		d = d[2:]
+		print('d = ' + d)
 		flagbyte = d[0:1]
 		d = d[1:]
+		print('d = ' + d)
 		# respect flagbyte, return correct pair
 		if flagbyte == '\xc0':
 			compressed = False
@@ -57,7 +61,10 @@ def decrypt(encrypted_privkey,passphrase):
 			compressed = True
 		addresshash = d[0:4]
 		d = d[4:-4]
-		key = scrypt.scrypt(passphrase,addresshash, 16384, 8, 8)
+		print('d = ' + d)
+		print('addresshash = ' + addresshash)
+		key = scrypt.scrypt(passphrase,addresshash, 16384, 8, 1)
+		print('key = ' + key)
 		derivedhalf1 = key[0:32]
 		derivedhalf2 = key[32:64]
 		encryptedhalf1 = d[0:16]
@@ -65,15 +72,4 @@ def decrypt(encrypted_privkey,passphrase):
 		decryptedhalf2 = aes.decryptData(derivedhalf2, encryptedhalf2)
 		decryptedhalf1 = aes.decryptData(derivedhalf2, encryptedhalf1)
 		priv = decryptedhalf1 + decryptedhalf2
-		priv = binascii.unhexlify('%064x' % (long(binascii.hexlify(priv), 16) ^ long(binascii.hexlify(derivedhalf1), 16)))
-		pub = address.privateKey2PublicKey(priv)
-		if compressed:
-			pub = encode_pubkey(pub,'hex_compressed')
-		addr = address.publicKey2Address(pub)
-		if hashlib.sha256(hashlib.sha256(addr).digest()).digest()[0:4] != addresshash:
-			print('Addresshash Error')
-			# TODO: investigate
-			#self.decrypt_priv(wx.PostEvent) # start over
-		else:
-			return priv
-			
+		return priv, addresshash
