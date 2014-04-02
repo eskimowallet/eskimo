@@ -56,9 +56,12 @@ def generate(cur, bip=False):
 	prefix = prefixes[random.randint(0, (len(prefixes)-1))] 
 	#generate the private and public keys
 	privateKey = rand.randomKey(inp.keyboardEntropy())
+	hexPrivK = enc.encode(privateKey, 16)
+	print('hex = ' + str(hexPrivK))
+	print('wif = ' + str(privateKey2Wif(privateKey, version[0], prefix,  version[2])))
 	publicAddress = publicKey2Address(privateKey2PublicKey(privateKey), version[0], prefix,  version[2])
 	#optional BIP0038 encryption
-	print('Creation of a BIP0038 encrypted private key can take a long time (~ 10 minutes)')
+	print('\nCreation of a BIP0038 encrypted private key can take a long time (~ 10 minutes)')
 	get.flushKeybuffer(get._Getch())
 	skip = raw_input('Do you want to skip BIP0038 encryption? (y) ').lower().strip()
 	if skip == 'n':
@@ -72,7 +75,7 @@ def generate(cur, bip=False):
 			elif len(bipPass1) < 1:
 				print('No passphrase was entered!')
 		reminder = raw_input('Enter an optional reminder for your password : ').strip()
-		privK = bip38.encrypt(privateKey, publicAddress, bipPass1)
+		privK = bip38.encrypt(hexPrivK, publicAddress, bipPass1)
 		isBip = True
 	else:
 		privK = privateKey

@@ -48,13 +48,13 @@ def decrypt(encrypted_privkey, passphrase):
 	
 	#2. Derive passfactor using scrypt with ownersalt and the user's passphrase and use it to recompute passpoint
 	d = enc.b58decode(encrypted_privkey, 39)
-Derive decryption key for seedb using scrypt with passpoint, addresshash, and ownersalt
-Decrypt encryptedpart2 using AES256Decrypt to yield the last 8 bytes of seedb and the last 8 bytes of encryptedpart1.
-Decrypt encryptedpart1 to yield the remainder of seedb.
-Use seedb to compute factorb.
-Multiply passfactor by factorb mod N to yield the private key associated with generatedaddress.
-Convert that private key into a Bitcoin address, honoring the compression preference specified in the encrypted key.
-Hash the Bitcoin address, and verify that addresshash from the encrypted private key record matches the hash. If not, report that the passphrase entry was incorrect.
+#Derive decryption key for seedb using scrypt with passpoint, addresshash, and ownersalt
+#Decrypt encryptedpart2 using AES256Decrypt to yield the last 8 bytes of seedb and the last 8 bytes of encryptedpart1.
+#Decrypt encryptedpart1 to yield the remainder of seedb.
+#Use seedb to compute factorb.
+#Multiply passfactor by factorb mod N to yield the private key associated with generatedaddress.
+#Convert that private key into a Bitcoin address, honoring the compression preference specified in the encrypted key.
+#Hash the Bitcoin address, and verify that addresshash from the encrypted private key record matches the hash. If not, #report that the passphrase entry was incorrect.
 	'''BIP0038 non-ec-multiply decryption. Returns WIF privkey.'''
 	
 	d = d[2:]
