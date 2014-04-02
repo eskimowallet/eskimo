@@ -72,7 +72,7 @@ def generate(cur, bip=False):
 			elif len(bipPass1) < 1:
 				print('No passphrase was entered!')
 		reminder = raw_input('Enter an optional reminder for your password : ').strip()
-		privK = bip38.encrypt(privateKey, publicAddress, bipPass1, version[0], version[1])
+		privK = bip38.encrypt(privateKey, publicAddress, bipPass1)
 		isBip = True
 	else:
 		privK = privateKey
