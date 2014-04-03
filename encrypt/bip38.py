@@ -19,6 +19,8 @@ def encrypt(privK, address, passphrase):
 	
 	#1. take the first four bytes of SHA256(SHA256()) of it. Let's call this "addresshash".
 	addresshash = hashlib.sha256(hashlib.sha256(address).digest()).digest()[:4]  # salt
+	
+	print('addresshash = ' + str(addresshash))
 
 	#2. Derive a key from the passphrase using scrypt
 	#	 a.  Parameters: passphrase is the passphrase itself encoded in UTF-8.
@@ -26,22 +28,33 @@ def encrypt(privK, address, passphrase):
 	#		 (n, r, p are provisional and subject to consensus)
 	key = scrypt.scrypt(passphrase, addresshash, 16384, 8, 8, 64)
 	
+	print('key = ' + str(key))
+	
 	#Let's split the resulting 64 bytes in half, and call them derivedhalf1 and derivedhalf2.
 	derivedhalf1 = key[0:32]
 	derivedhalf2 = key[32:64]
+	print('derivedhalf1 = ' + str(derivedhalf1))
+	print('derivedhalf2 = ' + str(derivedhalf2))
 	
 	#3. Do AES256Encrypt(bitcoinprivkey[0...15] xor derivedhalf1[0...15], derivedhalf2), call the 16-byte result encryptedhalf1
 	encryptedhalf1 = aes.encryptData(str(derivedhalf2), enc.sxor(privK[:16], derivedhalf1[:16]))
+	print('privK = ' + str(privK))
+	print('encryptedhalf1 = ' + str(encryptedhalf1))
 	
 	#4. Do AES256Encrypt(bitcoinprivkey[16...31] xor derivedhalf1[16...31], derivedhalf2), call the 16-byte result encryptedhalf2
 	encryptedhalf2 = aes.encryptData(str(derivedhalf2), enc.sxor(privK[16:32], derivedhalf1[16:32]))
+	print('encryptedhalf2 = ' + str(encryptedhalf2))
 	
 	#5. The encrypted private key is the Base58Check-encoded concatenation of the following, which totals 39 bytes without Base58 checksum:
 	#		0x01 0x42 + flagbyte + salt + encryptedhalf1 + encryptedhalf2
 	flagbyte = chr(0b11100000)  # 11 noec 1 compressedpub 00 future 0 ec only 00 future
 	privkey = ('\x01\x42' + flagbyte + addresshash + encryptedhalf1 + encryptedhalf2)
+	print('encPrivK = ' + str(privkey))
 	check = hashlib.sha256(hashlib.sha256(privkey).digest()).digest()[:4]
-	return enc.b58encode(privkey + check)
+	print('check = ' + str(check))
+	b58 = enc.b58encode(privkey + check)
+	print('b58 = ' + str(b58))
+	return b58
 	
 def decrypt(encrypted_privkey, passphrase):
 	#1. Collect encrypted private key and passphrase from user.

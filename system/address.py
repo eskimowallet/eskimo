@@ -55,8 +55,12 @@ def generate(cur, bip=False):
 	prefixes = version[1].split('|') 
 	prefix = prefixes[random.randint(0, (len(prefixes)-1))] 
 	#generate the private and public keys
-	privateKey = rand.randomKey(inp.keyboardEntropy())
+	privateKey = 40131568902706951395453712757810642216863964538517508976269348707743442884300 #rand.randomKey(inp.keyboardEntropy())
 	hexPrivK = enc.encode(privateKey, 16)
+	privK256 = enc.encode(privateKey, 256, 32)
+	print('')
+	print('raw = ' + str(privateKey))
+	print('256 = ' + str(privK256))
 	print('hex = ' + str(hexPrivK))
 	print('wif = ' + str(privateKey2Wif(privateKey, version[0], prefix,  version[2])))
 	publicAddress = publicKey2Address(privateKey2PublicKey(privateKey), version[0], prefix,  version[2])
@@ -75,7 +79,7 @@ def generate(cur, bip=False):
 			elif len(bipPass1) < 1:
 				print('No passphrase was entered!')
 		reminder = raw_input('Enter an optional reminder for your password : ').strip()
-		privK = bip38.encrypt(hexPrivK, publicAddress, bipPass1)
+		privK = bip38.encrypt(privK256, publicAddress, bipPass1)
 		isBip = True
 	else:
 		privK = privateKey

@@ -44,6 +44,6 @@ def keyboardEntropy(keynum=64):
 		hashes ^= rand.clockrnd()
 		out.prnt('\b\b\b\b\b\b{0:4d}\b\b\b\b\b'.format(step-1))
 	get.flushKeybuffer(keypress)
-	out.prnt('\b\b\b\b\b\b{0:4s}\b\b\b\b\b\n'.format('OK'))
+	out.prnt('\b\b\b\b\b\b{0:4s}\b\b\b\b\b\n'.format('  OK'))
 	get.flushKeybuffer(keypress)
 	return hashes ^ int(hashlib.sha512(typed*8).hexdigest(), 16)
