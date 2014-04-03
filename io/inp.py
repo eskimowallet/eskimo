@@ -6,7 +6,7 @@ import num.rand as rand
 
 def secure_passphrase(msg):
 	progress_step = 0
-	pretty_progress = ['\b\\', '\b|', '\b/', '\b-']
+	pretty_progress = ['\b@', '\b#', '\b*', '\b!']
 	keypress = get._Getch()
 	single_key = passw = ''
 	out.prnt(msg + '.....')

@@ -9,7 +9,7 @@ import num.enc as enc
 import num.rand as rand
 
 
-def encrypt(privK, address, passphrase):
+def encrypt(privK, address, passphrase, p):
 	'''
 		BIP0038 private key encryption, Non-EC
 	'''
@@ -23,7 +23,7 @@ def encrypt(privK, address, passphrase):
 	#	 a.  Parameters: passphrase is the passphrase itself encoded in UTF-8.
 	#		 addresshash came from the earlier step, n=16384, r=8, p=8, length=64
 	#		 (n, r, p are provisional and subject to consensus)
-	key = scrypt.scrypt(passphrase, addresshash, 16384, 8, 8, 64)
+	key = scrypt.scrypt(passphrase, addresshash, 16384, 8, p)
 	
 	#Let's split the resulting 64 bytes in half, and call them derivedhalf1 and derivedhalf2.
 	derivedhalf1 = key[0:32]
@@ -43,7 +43,7 @@ def encrypt(privK, address, passphrase):
 	check = hashlib.sha256(hashlib.sha256(privkey).digest()).digest()[:4]
 	return enc.b58encode(privkey + check)
 	
-def decrypt(encrypted_privkey, passphrase):
+def decrypt(encrypted_privkey, passphrase, p):
 	
 	#1. Collect encrypted private key and passphrase from user.
 	#	passed as parameters
@@ -56,7 +56,7 @@ def decrypt(encrypted_privkey, passphrase):
 	d = d[4:-4]	
 	
 	#3. Derive decryption key for seedb using scrypt with passpoint, addresshash, and ownersalt
-	key = scrypt.scrypt(passphrase,addresshash, 16384, 8, 8)
+	key = scrypt.scrypt(passphrase,addresshash, 16384, 8, p)
 	derivedhalf1 = key[0:32]
 	derivedhalf2 = key[32:64]
 	encryptedhalf1 = d[0:16]

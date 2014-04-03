@@ -22,7 +22,7 @@ def encrypt(passW):
 		encrypt the sqlite database
 	'''
 	#double check the password
-	checkPass = inp.secure_passphrase('Please re-enter your database password')
+	checkPass = inp.secure_passphrase('Please enter your database password')
 	if checkPass != passW.password:
 		print('your passwords don\'t match')
 		passW.getPass(True)

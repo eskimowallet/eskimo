@@ -55,31 +55,28 @@ def generate(cur, bip=False):
 	prefixes = version[1].split('|') 
 	prefix = prefixes[random.randint(0, (len(prefixes)-1))] 
 	#generate the private and public keys
-	privateKey = 40131568902706951395453712757810642216863964538517508976269348707743442884300 #rand.randomKey(inp.keyboardEntropy())
-	hexPrivK = enc.encode(privateKey, 16)
+	privateKey = rand.randomKey(inp.keyboardEntropy())
 	privK256 = enc.encode(privateKey, 256, 32)
-	print('')
-	print('raw = ' + str(privateKey))
-	print('256 = ' + str(privK256))
-	print('hex = ' + str(hexPrivK))
-	print('wif = ' + str(privateKey2Wif(privateKey, version[0], prefix,  version[2])))
 	publicAddress = publicKey2Address(privateKey2PublicKey(privateKey), version[0], prefix,  version[2])
 	#optional BIP0038 encryption
-	print('\nCreation of a BIP0038 encrypted private key can take a long time (~ 10 minutes)')
 	get.flushKeybuffer(get._Getch())
 	encrypt = raw_input('Do you want to BIP0038 encrypt your key? (n) ').lower().strip()
 	if encrypt == 'y':
 		bipPass1 = 'pass1' 
 		bipPass2 = 'pass2'
 		while bipPass1 != bipPass2 or len(bipPass1) < 1:
-			bipPass1 = inp.secure_passphrase('Enter your BIP0038 passphrase..... ')
-			bipPass2 = inp.secure_passphrase('Re-enter your passphrase to confirm..... ')
+			bipPass1 = inp.secure_passphrase('Enter your BIP0038 passphrase')
+			bipPass2 = inp.secure_passphrase('Re-enter your passphrase to confirm')
 			if bipPass1 != bipPass2:
 				print('The passphrases entered did not match.')
 			elif len(bipPass1) < 1:
 				print('No passphrase was entered!')
 		reminder = raw_input('Enter an optional reminder for your password : ').strip()
-		privK = bip38.encrypt(privK256, publicAddress, bipPass1)
+		print('')
+		print('Enter the number of rounds of encryption.')
+		p = raw_input('A smaller number means quicker but less secure. (8) : ').strip()
+		p = 8 if p == '' else int(p)
+		privK = bip38.encrypt(privK256, publicAddress, bipPass1, p)
 		isBip = True
 	else:
 		privK = privateKey
@@ -91,7 +88,7 @@ def generate(cur, bip=False):
 	addId = c.lastrowid
 	c.execute('insert into eskimo_master (address, privK) values (?,?);', (addId, privKid))
 	if isBip is True:
-		c.execute('insert into eskimo_bip (privK, reminder) values (?,?);', (privKid, reminder))
+		c.execute('insert into eskimo_bip (privK, reminder, p) values (?,?,?);', (privKid, reminder, p))
 	db.close(conn)
 	print('')
 	print(version[4] + ' Address : ' + publicAddress)
@@ -107,21 +104,21 @@ def dumpPrivKey(address):
 	conn = db.open()
 	c = conn.cursor()
 	#get the needed data from the database
-	c.execute('select p.id,p.privK,v.version,v.prefix,v.length from eskimo_privK as p inner join eskimo_master as m on p.id = m.privK inner join eskimo_addresses as a on a.id = m.address inner join eskimo_currencies as c on p.currency = c.id inner join eskimo_versions as v on c.version = v.id where a.address=?;', (address.encode('base64', 'strict'),))
-	privK = c.fetchone()
-	if privK is None:
+	c.execute('select p.id,p.privK,v.version,v.prefix,v.length,c.longName from eskimo_privK as p inner join eskimo_master as m on p.id = m.privK inner join eskimo_addresses as a on a.id = m.address inner join eskimo_currencies as c on p.currency = c.id inner join eskimo_versions as v on c.version = v.id where a.address=?;', (address.encode('base64', 'strict'),))
+	privData = c.fetchone()
+	if privData is None:
 		print(address + ' was not found')
 		return False
-	print('\nAddress : ' + address)
 	#check if the private key is bip encoded and get the password reminder if it is
-	c.execute('select reminder from eskimo_bip where privK=?;', (privK[0],))
+	c.execute('select reminder, p from eskimo_bip where privK=?;', (privData[0],))
 	bip = c.fetchone()
 	if bip is None:
 		isBip = False
 	else:
 		isBip = True
 		reminder = bip[0]
-	privK = privK[1].decode('base64', 'strict')
+		p = bip[1]
+	privK = privData[1].decode('base64', 'strict')
 	#ask if the user wants to decrypt a bip encrypted key
 	if isBip:
 		print('The private key found is BIP0038 encrypted.')
@@ -130,25 +127,28 @@ def dumpPrivKey(address):
 			bipPass1 = 'pass1' 
 			bipPass2 = 'pass2'
 			while bipPass1 != bipPass2 or len(bipPass1) < 1:
-				bipPass1 = inp.secure_passphrase('Enter your BIP0038 passphrase (' + bip[0] + ').....')
-				bipPass2 = inp.secure_passphrase('Re-enter your passphrase to confirm.....')
+				bipPass1 = inp.secure_passphrase('Enter your BIP0038 passphrase ' + ('(' + bip[0] + ')' if bip[0] != '' else ''))
+				bipPass2 = inp.secure_passphrase('Re-enter your passphrase to confirm')
 				if bipPass1 != bipPass2:
 					print('The passphrases entered did not match.')
 				elif len(bipPass1) < 1:
 					print('No passphrase was entered!')
 			#decrypt the private key using the supplied password
-			privK, addresshash = bip38.decrypt(privK, bipPass1)
+			privK, addresshash = bip38.decrypt(privK, bipPass1, p)
 			#decode the privK from base 256
 			privK = enc.decode(privK, 256)
 			#hash the address to check the decryption
-			if hashlib.sha256(hashlib.sha256(publicKey2Address(privateKey2PublicKey(privK))).digest()).digest()[0:4] != addresshash:
+			address = publicKey2Address(privateKey2PublicKey(privK), privData[2], privData[3], privData[4])
+			if hashlib.sha256(hashlib.sha256(address).digest()).digest()[0:4] != addresshash:
 				print('\nUnable to decrypt.')
-				print('Please try again with a different password.')
+				print('Please try again with a different passphrase.')
 				return False
 		else:
-			print('BIP0038 encrypted private key : ' + privK)
-			return True		
+			print('\n' + privData[5] + ' Address = ' + str(address))
+			print('\nBIP0038 encrypted private key : ' + privK)
+			return True	
+	print('\n' + privData[5] + ' Address = ' + str(address))			
 	print('\nPrivate key : ')
 	print('HEX : ' + enc.encode(privK, 16))
-	print('WIF : ' + privateKey2Wif(privK, privK[2], privK[3], privK[4]))
+	print('WIF : ' + privateKey2Wif(privK, privData[2], privData[3], privData[4]))
 	return True
