@@ -2,6 +2,7 @@ from hashlib import md5
 import os
 
 import encrypt.slowAes as aes
+import io.inp as inp
 import num.rand as rand
 import system.db as db
 
@@ -20,6 +21,11 @@ def encrypt(passW):
 	'''
 		encrypt the sqlite database
 	'''
+	#double check the password
+	checkPass = inp.secure_passphrase('Please re-enter your database password')
+	if checkPass != passW.password:
+		print('your passwords don\'t match')
+		passW.getPass(True)
 	print('encrypting database. please wait...')
 	bs = 128
 	inFile = 'igloo.dat'

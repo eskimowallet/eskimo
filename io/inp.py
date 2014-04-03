@@ -6,10 +6,10 @@ import num.rand as rand
 
 def secure_passphrase(msg):
 	progress_step = 0
-	pretty_progress = ['\b*', '\bo', '\bO']
+	pretty_progress = ['\b\\', '\b|', '\b/', '\b-']
 	keypress = get._Getch()
 	single_key = passw = ''
-	print(msg)
+	out.prnt(msg + '.....')
 	
 	while single_key != "\n" and single_key != chr(13):
 		while True:
@@ -19,7 +19,7 @@ def secure_passphrase(msg):
 	   
 		if single_key != "\n" and single_key != chr(13):
 			passw += single_key
-		out.prnt(pretty_progress[progress_step % 3])
+		out.prnt(pretty_progress[progress_step % 4])
 		progress_step += 1
 	print('\b')
 	return passw

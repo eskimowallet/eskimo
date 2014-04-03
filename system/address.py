@@ -136,19 +136,19 @@ def dumpPrivKey(address):
 					print('The passphrases entered did not match.')
 				elif len(bipPass1) < 1:
 					print('No passphrase was entered!')
+			#decrypt the private key using the supplied password
 			privK, addresshash = bip38.decrypt(privK, bipPass1)
-			print('privK = ' + str(privK))
-			print('addresshash = ' + str(addresshash))
-			print('priv58 = ' + enc.encode(privK, 58))
-			privK = enc.encode(privK, 58)
+			#decode the privK from base 256
+			privK = enc.decode(privK, 256)
+			#hash the address to check the decryption
 			if hashlib.sha256(hashlib.sha256(publicKey2Address(privateKey2PublicKey(privK))).digest()).digest()[0:4] != addresshash:
 				print('\nUnable to decrypt.')
 				print('Please try again with a different password.')
-				return
+				return False
 		else:
 			print('BIP0038 encrypted private key : ' + privK)
 			return True		
 	print('\nPrivate key : ')
 	print('HEX : ' + enc.encode(privK, 16))
 	print('WIF : ' + privateKey2Wif(privK, privK[2], privK[3], privK[4]))
-	return
+	return True

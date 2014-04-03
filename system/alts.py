@@ -37,8 +37,8 @@ def addAlt(cur):
 	if privK == '':
 		print('No private key entered')
 		return False
-	#alow for direct entry of version number
-	if len(privK) > 3:
+	#allow for direct entry of version number
+	if len(str(privK)) > 3:
 		version = scanPrivKey(privK)
 	else:
 		version = privK
@@ -76,11 +76,10 @@ def editAlt(cur):
 		privK = raw_input('Enter a private key : ').strip()
 		if privK =='':
 			newVersion = curId[3]
-		if len(privK) > 3:
+		if len(str(privK)) > 3:
 			version = scanPrivKey(privK)
 		else:
 			version = privK
-		print(str(version))
 		versionInt = version if version < 145 else 145
 		c.execute('select id from eskimo_versions where version=?;', (versionInt,))
 		versionDb = c.fetchone()

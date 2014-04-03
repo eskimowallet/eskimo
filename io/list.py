@@ -25,7 +25,7 @@ def showCurrencies():
 		return False
 	print('')
 	for currency in currencies:
-		print('{0: <5}'.format(str(currency[0])) + '   |   ' + '{0: >5}'.format(str(currency[1])) + '   |   ' + str(currency[2]))
+		print('{0: <5}'.format(str(currency[0])) + '   |   ' + '{0: <5}'.format('{0: >5}'.format(str(currency[1]))) + '   |   ' + str(currency[2]))
 	return True
 	
 def help():

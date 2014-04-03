@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Eskimo
+eskimo
 
 Cold storage crypto-currency address generator
 
@@ -35,6 +35,7 @@ else:
 		database.decrypt(passW)
 	else:
 		#otherwise get the password so that password encryption can take place
+		print('It looks like your database wasn\'t encrypted the last time you used eskimo') 
 		passW.getPass()
 	
 try:

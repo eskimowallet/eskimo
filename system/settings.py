@@ -27,7 +27,7 @@ class passW:
 		return
 	
 	def getPass(self, confirm=False):
-		self.password = inp.secure_passphrase('Enter your database password to decrypt the database')
+		self.password = inp.secure_passphrase('Enter your database password')
 		if confirm is True:
 			pass2 = inp.secure_passphrase('Re-enter your database password to confirm')
 			if self.password != pass2:
