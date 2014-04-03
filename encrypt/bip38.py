@@ -37,12 +37,13 @@ def encrypt(privK, address, passphrase):
 	print('derivedhalf2 = ' + str(derivedhalf2))
 	
 	#3. Do AES256Encrypt(bitcoinprivkey[0...15] xor derivedhalf1[0...15], derivedhalf2), call the 16-byte result encryptedhalf1
-	encryptedhalf1 = aes.encryptData(str(derivedhalf2), enc.sxor(privK[:16], derivedhalf1[:16]))
+	Aes = aes.Aes(half2)
+	encryptedhalf1 = Aes.enc(enc.sxor(privK[:16], derivedhalf1[:16]))
 	print('privK = ' + str(privK))
 	print('encryptedhalf1 = ' + str(encryptedhalf1))
 	
 	#4. Do AES256Encrypt(bitcoinprivkey[16...31] xor derivedhalf1[16...31], derivedhalf2), call the 16-byte result encryptedhalf2
-	encryptedhalf2 = aes.encryptData(str(derivedhalf2), enc.sxor(privK[16:32], derivedhalf1[16:32]))
+	encryptedhalf2 = Aes.enc(enc.sxor(privK[16:32], derivedhalf1[16:32]))
 	print('encryptedhalf2 = ' + str(encryptedhalf2))
 	
 	#5. The encrypted private key is the Base58Check-encoded concatenation of the following, which totals 39 bytes without Base58 checksum:

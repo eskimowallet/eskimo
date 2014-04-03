@@ -1,7 +1,7 @@
 from hashlib import md5
 import os
 
-import encrypt.aes as aes
+import encrypt.slowAes as aes
 import num.rand as rand
 import system.db as db
 
