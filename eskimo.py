@@ -45,6 +45,9 @@ try:
 		print('')
 		command = raw_input('Enter command >> ').strip().split()
 
+		if len(command) < 1:
+			continue
+		
 		if command[0].lower() == 'exit':
 			database.encrypt(passW)
 			sys.exit()
