@@ -44,46 +44,30 @@ def encrypt(privK, address, passphrase):
 	return enc.b58encode(privkey + check)
 	
 def decrypt(encrypted_privkey, passphrase):
+	
 	#1. Collect encrypted private key and passphrase from user.
-	
+	#	passed as parameters
 	#2. Derive passfactor using scrypt with ownersalt and the user's passphrase and use it to recompute passpoint
-	d = enc.b58decode(encrypted_privkey, 39)
-#Derive decryption key for seedb using scrypt with passpoint, addresshash, and ownersalt
-#Decrypt encryptedpart2 using AES256Decrypt to yield the last 8 bytes of seedb and the last 8 bytes of encryptedpart1.
-#Decrypt encryptedpart1 to yield the remainder of seedb.
-#Use seedb to compute factorb.
-#Multiply passfactor by factorb mod N to yield the private key associated with generatedaddress.
-#Convert that private key into a Bitcoin address, honoring the compression preference specified in the encrypted key.
-#Hash the Bitcoin address, and verify that addresshash from the encrypted private key record matches the hash. If not, #report that the passphrase entry was incorrect.
-	'''BIP0038 non-ec-multiply decryption. Returns WIF privkey.'''
-	
+	d = enc.b58decode(encrypted_privkey)
 	d = d[2:]
 	flagbyte = d[0:1]
 	d = d[1:]
-	if flagbyte == '\xc0':
-		compressed = False
-	if flagbyte == '\xe0':
-		compressed = True
 	addresshash = d[0:4]
-	d = d[4:-4]
-	key = scrypt.scrypt(passphrase,addresshash, 16384, 8, 1)
+	d = d[4:-4]	
+	
+	#3. Derive decryption key for seedb using scrypt with passpoint, addresshash, and ownersalt
+	key = scrypt.scrypt(passphrase,addresshash, 16384, 8, 8)
 	derivedhalf1 = key[0:32]
 	derivedhalf2 = key[32:64]
 	encryptedhalf1 = d[0:16]
 	encryptedhalf2 = d[16:32]
-	decryptedhalf2 = aes.decryptData(derivedhalf2, encryptedhalf2)
-	decryptedhalf1 = aes.decryptData(derivedhalf2, encryptedhalf1)
+	Aes = aes.Aes(derivedhalf2)
+	
+	#4. Decrypt encryptedpart2 using AES256Decrypt to yield the last 8 bytes of seedb and the last 8 bytes of encryptedpart1.
+	decryptedhalf2 = Aes.dec(encryptedhalf2)
+	
+	#5. Decrypt encryptedpart1 to yield the remainder of seedb.
+	decryptedhalf1 = Aes.dec(encryptedhalf1)
 	priv = decryptedhalf1 + decryptedhalf2
-	print('priv = ' + priv)
 	priv = binascii.unhexlify('%064x' % (long(binascii.hexlify(priv), 16) ^ long(binascii.hexlify(derivedhalf1), 16)))
-	print('priv = ' + priv)
-	#pub = privtopub(priv)
-	#if compressed:
-	#	pub = encode_pubkey(pub,'hex_compressed')
-	#	wif = encode_privkey(priv,'wif_compressed')
-	#else:
-	#	wif = encode_privkey(priv,'wif')
-	#addr = pubtoaddr(pub)
-	#if hashlib.sha256(hashlib.sha256(addr).digest()).digest()[0:4] != addresshash:
-	#	print('Addresshash verification failed! Password is likely incorrect.')
-	#return wif
+	return priv, addresshash

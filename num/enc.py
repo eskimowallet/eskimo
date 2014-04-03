@@ -33,7 +33,7 @@ def b58encode(v):
 
   return (__b58chars[0]*nPad) + result
 
-def b58decode(v, length):
+def b58decode(v, length=None):
   """ decode v into a string of len bytes
   """
   long_value = 0L

@@ -53,11 +53,7 @@ def decrypt(passW):
 	bs = 128
 	inFile = 'iceblock'
 	outFile = 'igloo.dat'
-	if not os.path.isfile(inFile) and os.path.isfile(outFile):
-		print('here')
-		if db.testDec():
-			print('database is already decrypted')
-			return
+	if os.path.isfile(outFile):
 		passW.getPass(True)
 	else:
 		passW.getPass(False)
