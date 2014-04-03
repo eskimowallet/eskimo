@@ -58,7 +58,9 @@ def decrypt(passW):
 		if db.testDec():
 			print('database is already decrypted')
 			return
-	passW.getPass()
+		passW.getPass(True)
+	else:
+		passW.getPass(False)
 	in_file = open(inFile, 'rb')
 	out_file = open(outFile, 'wb')
 	print('decrypting database. please wait...')

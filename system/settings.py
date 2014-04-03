@@ -26,8 +26,14 @@ class passW:
 		print('password has been set')
 		return
 	
-	def getPass(self):
+	def getPass(self, confirm=False):
 		self.password = inp.secure_passphrase('Enter your database password to decrypt the database')
+		if confirm is True:
+			pass2 = inp.secure_passphrase('Re-enter your database password to confirm')
+			if self.password != pass2:
+				print('The passwords did not match')
+				self.getPass(True)
+				return
 		return self.password
 		
 	def editPass(self):

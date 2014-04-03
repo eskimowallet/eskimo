@@ -67,8 +67,8 @@ def generate(cur, bip=False):
 	#optional BIP0038 encryption
 	print('\nCreation of a BIP0038 encrypted private key can take a long time (~ 10 minutes)')
 	get.flushKeybuffer(get._Getch())
-	skip = raw_input('Do you want to skip BIP0038 encryption? (y) ').lower().strip()
-	if skip == 'n':
+	encrypt = raw_input('Do you want to BIP0038 encrypt your key? (n) ').lower().strip()
+	if encrypt == 'y':
 		bipPass1 = 'pass1' 
 		bipPass2 = 'pass2'
 		while bipPass1 != bipPass2 or len(bipPass1) < 1:
