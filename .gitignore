@@ -1,6 +1,5 @@
 *.pyc
 */*.pyc
 *.dat
-*.json
 iceblock
 *.ico

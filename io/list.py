@@ -61,7 +61,7 @@ def help():
 	print('exportcur')
 	print('  Export your systems currency data to a currencies.json file')
 	print('importcur')
-	print('  Import a currencies.json currency data file to overwrite the currency data in your system.')
+	print('  Import a currencies.json currency data file into your system.')
 	print('entropycheck')
 	print('  Check your platform for a strong source of time based entropy.')
 	print('setpass')

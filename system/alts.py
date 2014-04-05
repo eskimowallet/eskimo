@@ -44,7 +44,7 @@ def addAlt(cur):
 		version = int(privK)
 	#all version from 145-255 have the same prefix etc.
 	#we only store up to 145 in the database
-	versionInt = version if version > 145 else 145
+	versionInt = version if version < 145 else 145
 	c.execute('select id from eskimo_versions where version=?;', (versionInt,))
 	versionId = c.fetchone()
 	if versionId is None:
@@ -59,7 +59,7 @@ def addAlt(cur):
 def editAlt(cur):
 	conn = db.open()
 	c = conn.cursor()
-	c.execute('select id,currency,longName,version from eskimo_currencies where currency=?;', (cur.upper(), ))
+	c.execute('select c.id,c.currency,c.longName,v.version from eskimo_currencies as c inner join eskimo_versions as v on c.version = v.id where c.currency=?;', (cur.upper(), ))
 	curId = c.fetchone()
 	if curId is None:
 		print(cur.upper() + ' doesn\'t exist in the system')
@@ -69,23 +69,22 @@ def editAlt(cur):
 	newCur = curId[1] if newCur == '' else newCur
 	newLongName = raw_input('Enter the new full name (' + curId[2] + ') : ').capitalize().strip()
 	newLongName = curId[2] if newLongName == '' else newLongName
-	privK = raw_input('Enter a private key : ').strip()
+	privK = raw_input('Enter a private key (' + str(curId[3]) + ') : ').strip()
 	if privK =='':
-		newVersion = curId[3]
-	if len(str(privK)) > 3:
+		version = curId[3]
+	elif len(privK) > 3:
 		version = scanPrivKey(privK)
 	else:
 		version = int(privK)
-	versionInt = version if version > 145 else 145
+	versionInt = version if version < 145 else 145
 	c.execute('select id from eskimo_versions where version=?;', (versionInt,))
 	versionDb = c.fetchone()
 	if versionDb is None:
 		print('Version ' + str(version) + ' does not exist in the system')
-		newVersion = curId[3]
+		return False
 	else:
 		newVersion = versionDb[0]
 	c.execute('update eskimo_currencies set currency=?, longName=?, version=? where id=?;', (newCur, newLongName, newVersion, curId[0]))
 	db.close(conn)
 	print(newCur + ' saved')
-	print('version ' + str(version))
 	return True
