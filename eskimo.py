@@ -17,7 +17,7 @@ import io.list as list
 import num.rand as rand
 import system.address as address
 import system.alts as alts
-import system.curData as curData
+import system.data as data
 import system.dbCreate as dbCreate
 from system.settings import passW
 passW = passW()
@@ -48,7 +48,7 @@ try:
 		if len(command) < 1:
 			continue
 		
-		if command[0].lower() == 'exit':
+		elif command[0].lower() == 'exit':
 			database.encrypt(passW)
 			sys.exit()
 
@@ -96,12 +96,12 @@ try:
 			alts.editAlt(command[1])
 			continue
 			
-		elif command[0].lower() == 'import':
-			curData.importAlts()
+		elif command[0].lower() == 'importcur':
+			data.importAlts()
 			continue
 			
-		elif command[0].lower() == 'export':
-			curData.exportAlts()
+		elif command[0].lower() == 'exportcur':
+			data.exportAlts()
 			continue
 
 		elif command[0].lower() == 'gen':
@@ -115,8 +115,9 @@ try:
 			print(command[0] + ' was not recognised as a command')
 			continue
 
-except KeyboardInterrupt:
+except:
 	#naughty I know but this should ensure that the database gets encrypted if an unforeseen error occurs
-	print('caught exception : ' + str(sys.exc_info()[0]))
-	database.encrypt(passW)
+	if str(sys.exc_info()[0]) != '<type \'exceptions.SystemExit\'>':
+		print('Caught exception : ' + str(sys.exc_info()[0]))
+		database.encrypt(passW)
 	sys.exit()

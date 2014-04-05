@@ -21,6 +21,8 @@ def testDec():
 				return False
 			else:
 				print(e)
+				return False
+		return True
 	else:
 		return False
-	return True
+	

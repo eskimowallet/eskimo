@@ -14,7 +14,7 @@ def encrypt(privK, address, passphrase, p):
 		BIP0038 private key encryption, Non-EC
 	'''
 	
-	print('calculating BIP0038 encrypted private key...')
+	print('Calculating BIP0038 encrypted private key...')
 	
 	#1. take the first four bytes of SHA256(SHA256()) of it. Let's call this "addresshash".
 	addresshash = hashlib.sha256(hashlib.sha256(address).digest()).digest()[:4]  # salt
@@ -45,6 +45,7 @@ def encrypt(privK, address, passphrase, p):
 	
 def decrypt(encrypted_privkey, passphrase, p):
 	
+	print('Decrypting private key...')
 	#1. Collect encrypted private key and passphrase from user.
 	#	passed as parameters
 	#2. Derive passfactor using scrypt with ownersalt and the user's passphrase and use it to recompute passpoint

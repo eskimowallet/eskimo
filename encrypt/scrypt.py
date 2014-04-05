@@ -166,7 +166,7 @@ def scrypt(password, salt, n, r, p, buflen=64):
         t = t[mflen:]
 
     for i in range(p):
-        print('stage ' + str(i+1) + ' of ' + str(p))
+        print('Stage ' + str(i+1) + ' of ' + str(p))
         b[i] = smix(b[i], n, r=r)
     return pbkdf(password, ''.join(b), 1, buflen, digestmod=hashlib.sha256)
 
