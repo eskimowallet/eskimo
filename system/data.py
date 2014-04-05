@@ -26,14 +26,19 @@ def importAlts():
 		currencies = json.load(dataFile)
 	conn = db.open()
 	c = conn.cursor()
-	c.execute('delete from eskimo_currencies;')
 	for cur in currencies:
 		version = cur['version'] if cur['version'] < 145 else 145
 		c.execute('select id from eskimo_versions where version=?;', (version,))
 		versionId = c.fetchone()
 		if versionId is None:
 			continue
-		c.execute('insert into eskimo_currencies (currency, longName, version) values (?,?,?);', (cur['currency'], cur['longName'], versionId))
+		c.execute('select id from eskimo_currencies where currency=?;', (cur['currency'],))
+		curId = c.fetchone()
+		if curId is None:
+			#currency doesn't exist in the system so add it
+			c.execute('insert into eskimo_currencies (currency, longName, version) values (?,?,?);', (cur['currency'], cur['longName'], versionId[0]))
+		else:
+			c.execute('update eskimo_currencies set currency=?, longName=?, version=? where id=?;', (cur['currency'], cur['longName'], versionId[0], curId[0]))
 	db.close(conn)
 	print('import finished')
 	return True
