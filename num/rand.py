@@ -42,7 +42,8 @@ def platformCheck(checks=1000):
 	duplicateCheck = Counter(randList).most_common(1)
 	x, count = duplicateCheck[0]
 	if count != 1:
-		raise Exception('FAIL: time-based entropy is not always unique!')
+		print('FAIL: time-based entropy is not always unique!')
+		return False
 	print('...pass')
 	return True
 
@@ -51,7 +52,8 @@ def randomKey(entropy):
 	256 bit number from equally strong urandom, user entropy, and timer parts
 	"""
 	if entropy.bit_length() < 250:
-		raise Exception('Insufficent entropy parameter to generate key')
+		print('Insufficent entropy parameter to generate key')
+		return False
 	from random import SystemRandom
 	osrndi = SystemRandom()
 	entstr = enc.encode(entropy, 16) + enc.encode(osrndi.getrandbits(512), 256) + str(clockrnd())

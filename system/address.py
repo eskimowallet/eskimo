@@ -132,7 +132,7 @@ def dumpPrivKey(address):
 				if bipPass1 != bipPass2:
 					print('The passphrases entered did not match.')
 				elif len(bipPass1) < 1:
-					print('No passphrase was entered!')
+					print('No passphrase was entered')
 			#decrypt the private key using the supplied password
 			privK, addresshash = bip38.decrypt(privK, bipPass1, p)
 			#decode the privK from base 256

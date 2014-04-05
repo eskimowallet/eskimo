@@ -9,7 +9,7 @@ def secure_passphrase(msg):
 	pretty_progress = ['\b@', '\b#', '\b*', '\b!']
 	keypress = get._Getch()
 	single_key = passw = ''
-	out.prnt(msg + '.....')
+	out.prnt(msg + ' :  ')
 	
 	while single_key != "\n" and single_key != chr(13):
 		while True:
@@ -30,7 +30,7 @@ def keyboardEntropy(keynum=64):
 	"""
 
 	keypress = get._Getch()
-	typed = kr = 'Press some keys to generate a secure address........'
+	typed = kr = 'Press some keys to generate a secure address...'
 	hashes = rand.clockrnd()
 	print(kr)
 	for step in range(keynum, 0, -1):
