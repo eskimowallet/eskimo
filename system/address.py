@@ -31,7 +31,7 @@ def base58Encode(r160, magicbyte=0, prefix=1, length=0):
 	""" Base58 encoding w leading zero compact
 	"""
 	from re import match as re_match
-	inp_fmtd = chr(int(magicbyte)) + r160
+	inp_fmtd = chr(int(magicbyte if magicbyte < 255 else 255)) + r160
 	leadingzbytes = len(re_match('^\x00*', inp_fmtd).group(0))
 	checksum = hashlib.sha256(hashlib.sha256(inp_fmtd).digest()).digest()[:4]
 	return str(prefix) * leadingzbytes + enc.encode(enc.decode(inp_fmtd + checksum, 256), 58, 0)
@@ -46,7 +46,7 @@ def generate(cur, bip=False):
 	conn = db.open()
 	c = conn.cursor()
 	#pull the version details from the database
-	c.execute('select v.version,v.prefix,v.length,c.id,c.longName from eskimo_versions as v inner join eskimo_currencies as c on c.version = v.id where c.currency=?;', (cur.upper(),))
+	c.execute('select v.version,v.prefix,v.length,c.id,c.longName,c.version from eskimo_versions as v inner join eskimo_currencies as c on c.version = v.id where c.currency=?;', (cur.upper(),))
 	version = c.fetchone()
 	if version is None:
 		print(cur.upper() + ' is not currently listed as a currency')
@@ -86,7 +86,7 @@ def generate(cur, bip=False):
 	privKid = c.lastrowid
 	c.execute('insert into eskimo_addresses (address, currency) values (?,?);', (publicAddress.encode('base64','strict'), version[3]))
 	addId = c.lastrowid
-	c.execute('insert into eskimo_master (address, privK) values (?,?);', (addId, privKid))
+	c.execute('insert into eskimo_master (address, privK, version) values (?,?,?);', (addId, privKid, version[5]))
 	if isBip is True:
 		c.execute('insert into eskimo_bip (privK, reminder, p) values (?,?,?);', (privKid, reminder, p))
 	db.close(conn)

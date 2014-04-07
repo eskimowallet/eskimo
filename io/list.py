@@ -3,7 +3,10 @@ import system.db as db
 def showAddresses(cur):
 	conn = db.open()
 	c = conn.cursor()
-	c.execute('select a.address from eskimo_addresses as a inner join eskimo_currencies as c on a.currency = c.id where c.currency = ?;', (cur.upper(),))
+	#get the current version of the currency
+	c.execute('select version from eskimo_currencies where currency=?;', (cur.upper(),))
+	version = c.fetchone()
+	c.execute('select a.address from eskimo_addresses as a inner join eskimo_currencies as c on a.currency = c.id inner join eskimo_master as m on a.id = m.address where c.currency = ? and m.version=?;', (cur.upper(), version[0]))
 	addresses = c.fetchall()
 	db.close(conn)
 	if not addresses:
@@ -17,15 +20,21 @@ def showAddresses(cur):
 def showCurrencies():
 	conn = db.open()
 	c = conn.cursor()
-	c.execute('select c.currency,c.longName,v.version from eskimo_currencies as c inner join eskimo_versions as v on c.version=v.id;')
+	c.execute('select c.id,c.currency,c.longName,v.version,v.id from eskimo_currencies as c inner join eskimo_versions as v on c.version=v.id order by c.currency;')
 	currencies = c.fetchall()
-	db.close(conn)
 	if not currencies:
 		print('No currencies exist in the system')
 		return False
 	print('')
 	for currency in currencies:
-		print('{0: ^8}'.format(str(currency[0])) + '   |   ' + '{0: ^16}'.format(str(currency[1])) + '   |   ' + '{0:>4}'.format(str(currency[2])))
+		c.execute('select count(a.id) from eskimo_addresses as a inner join eskimo_master as m on a.id = m.address where a.currency=? and m.version=?;', (currency[0],currency[4]))
+		addr = c.fetchone()
+		if addr is None:
+			numAddr = 0
+		else:
+			numAddr = addr[0]
+		print('{0: ^8}'.format(str(currency[1])) + '   |   ' + '{0: ^16}'.format(str(currency[2])) + '   |   ' + '{0:>4}'.format(str(currency[3])) + '   |   ' + '{0:>4}'.format(str(numAddr)))
+	db.close(conn)
 	return True
 	
 def help():
