@@ -113,7 +113,7 @@ try:
 		
 		#a couple of debugging functions here.
 		#the first generates address and priv keys for all currencies in the system
-		#the second does the same but with BIP38 encryption which is also tests
+		#the second does the same but with BIP38 encryption which iT also tests
 		elif command[0].lower() == 'genall':
 			data.genAll()
 			continue
@@ -126,7 +126,7 @@ try:
 			print(command[0] + ' was not recognised as a command')
 			continue
 
-except KeyboardInterrupt:
+except:
 	#naughty I know but this should ensure that the database gets encrypted if an unforeseen error occurs
 	if str(sys.exc_info()[0]) != '<type \'exceptions.SystemExit\'>':
 		print('An unforseen error occurred. Attempting to encrypt database.')
