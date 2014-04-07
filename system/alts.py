@@ -10,14 +10,14 @@ def base58_to_hex(b58str):
 		n += digit
 	return hex(n)
   	
-def scanPrivKey(privK):
+def scan(privK, minimum=0):
 	hexK = base58_to_hex(privK)
 	prefix = hexK[0:3]
 	i = 3
-	while int(prefix, 16) < 128:
+	while int(prefix, 16) < minimum:
 		prefix += hexK[i]
 		i += 1
-	return int(prefix, 16)-128
+	return int(prefix, 16)-minimum
   	
 def addAlt(cur):
 	conn = db.open()
@@ -32,16 +32,25 @@ def addAlt(cur):
 		print('Currencies need a full name')
 		db.close(conn)
 		return False
-	privK = raw_input('Enter a private key : ').strip()
-	if privK == '':
-		print('No private key entered')
+	versionString = raw_input('Enter a private key or version number for ' + cur.upper() + ' : ').strip()
+	if versionString == '':
+		print('No data was entered')
 		db.close(conn)
 		return False
-	#allow for direct entry of version number
-	if len(str(privK)) > 3:
-		version = scanPrivKey(privK)
+	#decide what we're dealing with
+	if len(versionString) <= 3:
+		#length of the string is up to 3 characters, it's a version number
+		version = int(versionString)
+	elif len(versionString) > 30 and len(versionString) < 35:
+		#between 30 and 35 length, it's an address
+		version = scan(versionString)
+	elif len(versionString) > 50:
+		#over 50 length, it's a private key
+		version = scan(versionString, 128)
 	else:
-		version = int(privK)
+		print(versionString + ' doesn\'t look like an address or private key and is too long to be a version number.')
+		db.close(conn)
+		return False
 	#all version from 145-255 have the same prefix etc.
 	#we only store up to 145 in the database
 	versionInt = version if version < 145 else 145
@@ -69,13 +78,22 @@ def editAlt(cur):
 	newCur = curId[1] if newCur == '' else newCur
 	newLongName = raw_input('Enter the new full name (' + curId[2] + ') : ').capitalize().strip()
 	newLongName = curId[2] if newLongName == '' else newLongName
-	privK = raw_input('Enter a private key (' + str(curId[3]) + ') : ').strip()
-	if privK =='':
+	versionString = raw_input('Enter a private key or version number for ' + newCur.upper() + ' (' + str(curId[3]) + ') : ').strip()
+	if versionString == '':
 		version = curId[3]
-	elif len(privK) > 3:
-		version = scanPrivKey(privK)
+	#decide what we're dealing with
+	if len(versionString) <= 3:
+		#length of the string is up to 3 characters, it's a version number
+		version = int(versionString)
+	elif len(versionString) > 30 and len(versionString) < 35:
+		#between 30 and 35 length, it's an address
+		version = scan(versionString)
+	elif len(versionString) > 50:
+		#over 50 length, it's a private key
+		version = scan(versionString, 128)
 	else:
-		version = int(privK)
+		print(versionString + ' doesn\'t look like an address or private key and is too long to be a version number.')
+		version = curId[3]
 	versionInt = version if version < 145 else 145
 	c.execute('select id from eskimo_versions where version=?;', (versionInt,))
 	versionDb = c.fetchone()
@@ -86,5 +104,5 @@ def editAlt(cur):
 		newVersion = versionDb[0]
 	c.execute('update eskimo_currencies set currency=?, longName=?, version=? where id=?;', (newCur, newLongName, newVersion, curId[0]))
 	db.close(conn)
-	print(newCur + ' saved')
+	print(newCur + ' saved as version ' + str(version))
 	return True

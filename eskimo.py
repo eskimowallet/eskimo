@@ -110,14 +110,25 @@ try:
 				continue
 			address.generate(command[1])
 			continue
+		
+		#a couple of debugging functions here.
+		#the first generates address and priv keys for all currencies in the system
+		#the second does the same but with BIP38 encryption which is also tests
+		elif command[0].lower() == 'genall':
+			data.genAll()
+			continue
+			
+		elif command[0].lower() == 'bipall':
+			data.genAll(True)
+			continue
 
 		else:
 			print(command[0] + ' was not recognised as a command')
 			continue
 
-except:
+except KeyboardInterrupt:
 	#naughty I know but this should ensure that the database gets encrypted if an unforeseen error occurs
 	if str(sys.exc_info()[0]) != '<type \'exceptions.SystemExit\'>':
-		print('Caught exception : ' + str(sys.exc_info()[0]))
+		print('An unforseen error occurred. Attempting to encrypt database.')
 		database.encrypt(passW)
 	sys.exit()
