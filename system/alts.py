@@ -82,7 +82,7 @@ def editAlt(cur):
 	if versionString == '':
 		version = curId[3]
 	#decide what we're dealing with
-	if len(versionString) <= 3:
+	elif len(versionString) > 0 and len(versionString) <= 3:
 		#length of the string is up to 3 characters, it's a version number
 		version = int(versionString)
 	elif len(versionString) > 30 and len(versionString) < 35:
