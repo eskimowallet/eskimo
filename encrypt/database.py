@@ -26,7 +26,7 @@ def encrypt(passW):
 	if checkPass != passW.password:
 		print('Your passwords don\'t match')
 		passW.getPass(True)
-	print('Encrypting database. please wait...')
+	print('Encrypting database. Please wait...')
 	bs = 128
 	inFile = 'igloo.dat'
 	outFile = 'iceblock'
@@ -65,7 +65,7 @@ def decrypt(passW):
 		passW.getPass(False)
 	in_file = open(inFile, 'rb')
 	out_file = open(outFile, 'wb')
-	print('Decrypting database. please wait...')
+	print('Decrypting database. Please wait...')
 	salt = in_file.read(bs)[len('Salted__'):]
 	key, iv = derive_key_and_iv(passW.password, salt, 32, bs)
 	next_chunk = ''
